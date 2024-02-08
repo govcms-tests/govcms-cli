@@ -1,5 +1,4 @@
-The MIT License (MIT)
-
+/*
 Copyright © 2024 Joseph Zhao pandaski@outlook.com.au
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,3 +18,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/govcms-tests/govcms-cli/pkg/utils"
+	"github.com/spf13/cobra"
+)
+
+// issueCmd represents the issue command
+var issueCmd = &cobra.Command{
+	Use:   "issue",
+	Short: "Open a new issue on the GovCMS GitHub repository",
+	Long:  "Open a new issue on the GovCMS GitHub repository.",
+	Run: func(cmd *cobra.Command, args []string) {
+		url := "https://github.com/govCMS/GovCMS/issues/new/choose"
+		if err := utils.OpenBrowser(url); err != nil {
+			fmt.Printf("Error opening browser for URL: %s\nError: %v\n", url, err)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(issueCmd)
+}
