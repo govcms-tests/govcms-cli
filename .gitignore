@@ -19,3 +19,6 @@ go.work
 
 # OS
 .DS_Store
+
+# GovCMS sites
+govcms/

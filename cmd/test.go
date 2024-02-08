@@ -24,30 +24,19 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/govcms-tests/govcms-cli/utils/docker"
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Pulls Docker images and recreates the containers",
-	Long:  "Pulls Docker images and recreates the containers.",
+// testCmd represents the test command
+var testCmd = &cobra.Command{
+	Use:   "test",
+	Short: "Run tests",
+	Long:  `Run tests.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// List of Docker image names to pull
-		imageList := []string{"govcmsextras/dnsmasq", "adminer", "mariadb:lts", "mailhog/mailhog"}
-		// Iterate over the image list
-		for _, imageName := range imageList {
-			err := docker.DockerImagePull(imageName)
-			if err != nil {
-				fmt.Printf("Error pulling image %s: %v\n", imageName, err)
-				continue // Continue to the next image on error
-			}
-			fmt.Printf("Successfully pulled image: %s\n", imageName)
-		}
+		fmt.Println("test called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(testCmd)
 }
