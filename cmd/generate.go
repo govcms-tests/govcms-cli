@@ -25,6 +25,10 @@ import (
 	"fmt"
 
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
+	"os"
+	"path/filepath"
+
+	"github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
 )
 
