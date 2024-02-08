@@ -1,73 +1,41 @@
+/*
+Copyright © 2024 Joseph Zhao pandaski@outlook.com.au
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
 package cmd
 
 import (
-	"fmt"
-	"github.com/govcms-tests/govcms-cli/data"
-	"github.com/savioxavier/termlink"
+	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/spf13/cobra"
-	"os"
-	"os/exec"
 )
 
-type saveOutput struct {
-	savedOutput []byte
-}
-
-func (so *saveOutput) Write(p []byte) (n int, err error) {
-	so.savedOutput = append(so.savedOutput, p...)
-	return os.Stdout.Write(p)
-}
-
+// upCmd represents the up command
 var upCmd = &cobra.Command{
-	Use:   "up [resource]",
-	Short: "Launch docker container",
+	Use:   "up",
+	Short: "Initiates the GovCMS local development environment",
+	Long:  "Initiates the GovCMS local development environment.",
 	Run: func(cmd *cobra.Command, args []string) {
-		var so saveOutput
-		var installPath string
-		var name string
-
-		if len(args) < 1 {
-			installPath = "govcms/distribution"
-		} else {
-			name = args[0]
-		}
-
-		installPath = data.GetInstallPath(name)
-		fmt.Println("Attempting to launch site located at " + installPath)
-
-		command := exec.Command("/bin/sh", "-c", "docker compose up -d")
-		command.Dir = installPath
-
-		command.Stdin = os.Stdin
-		command.Stdout = &so
-		command.Stderr = os.Stderr
-
-		_ = command.Run()
-		fmt.Printf("%s", so.savedOutput)
-
-		fmt.Println("\nLocal server has started at", termlink.Link("http://localhost:8888", "http://localhost:8888"))
-	},
-}
-
-var downCmd = &cobra.Command{
-	Use:   "down",
-	Short: "Stop docker container",
-	Run: func(cmd *cobra.Command, arg []string) {
-		var so saveOutput
-
-		command := exec.Command("/bin/sh", "-c", "docker compose down")
-		command.Dir = "govcms/distribution"
-
-		command.Stdin = os.Stdin
-		command.Stdout = &so
-		command.Stderr = os.Stderr
-
-		_ = command.Run()
-		fmt.Printf("%s", so.savedOutput)
+		govcms.Start()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(upCmd)
-	rootCmd.AddCommand(downCmd)
 }

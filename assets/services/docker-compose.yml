@@ -1,0 +1,76 @@
+services:
+  ##########################################
+  # govcms: The GovCMS local development
+  ##########################################
+
+
+  ##########################################
+  # mariadb: The database used by local
+  ##########################################
+  mariadb:
+    container_name: mariadb
+    image: mariadb:lts
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: drupal
+      MARIADB_USER: drupal
+      MARIADB_PASSWORD: drupal
+    volumes:
+      - /var/lib/mysql
+
+  ##########################################
+  # adminer: The database tool used by local
+  ##########################################
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: mariadb
+    depends_on:
+      - mariadb
+    ports:
+      - "8080"
+
+  ##########################################
+  # mailhog: The email tool used by local
+  ##########################################
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    environment:
+      - VIRTUAL_HOST=mailhog.test
+      - VIRTUAL_PORT=8025
+    expose:
+      - "8025"
+    ports:
+      - "8025"
+
+  ##########################################
+  # nginx-proxy: Nginx reverse proxy for docker containers
+  ##########################################
+  dnsmasq:
+    container_name: dnsmasq
+    image: govcmsextras/dnsmasq
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    ports:
+      - "53:53/udp"
+
+  ##########################################
+  # nginx-proxy: Nginx reverse proxy for docker containers
+  ##########################################
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+networks:
+  govcms-network:
+    external: true
+  amazeeio-network:
+    external: true
+  default:
+    external: false

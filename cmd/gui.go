@@ -22,20 +22,35 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/govcms-tests/govcms-cli/pkg/govcms"
+	"fmt"
+	"strconv"
+
+	"github.com/govcms-tests/govcms-cli/pkg/ui"
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Ensures Docker images for GovCMS services are up to date",
-	Long:  "Ensures Docker images for GovCMS services are up to date.",
+// guiCmd represents the gui command
+var guiCmd = &cobra.Command{
+	Use:   "gui",
+	Short: "Launches a user-friendly interface",
+	Long:  "Launches a user-friendly interface for GovCMS command-line operations.",
 	Run: func(cmd *cobra.Command, args []string) {
-		govcms.Update()
+		port, _ := cmd.Flags().GetString("port")
+
+		// Validate if the provided port is a valid number
+		_, err := strconv.Atoi(port)
+		if err != nil {
+			fmt.Println("Error: Port number must be a valid number")
+			return
+		}
+
+		ui.Start(port)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(guiCmd)
+
+	// Define the flag for the port option
+	guiCmd.Flags().StringP("port", "p", "3000", "Port number")
 }

@@ -30,8 +30,8 @@ import (
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Check current installed version",
-	Long:  "Check current installed version.",
+	Short: "Displays the currently installed version",
+	Long:  "Displays the currently installed version of the GovCMS command-line tool.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("v0.1.0 -- HEAD")
 	},

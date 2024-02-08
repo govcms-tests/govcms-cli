@@ -22,20 +22,34 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Ensures Docker images for GovCMS services are up to date",
-	Long:  "Ensures Docker images for GovCMS services are up to date.",
+// requirementsCmd represents the requirements command
+var requirementsCmd = &cobra.Command{
+	Use:    "requirements",
+	Short:  "Check system requirements before running commands",
+	Hidden: true, // Hide this command from help messages
 	Run: func(cmd *cobra.Command, args []string) {
-		govcms.Update()
+		govcms.CheckRequirements()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(requirementsCmd)
+
+	// Register the persistent pre-run function
+	rootCmd.PersistentPreRunE = preRun
+}
+
+func preRun(cmd *cobra.Command, args []string) error {
+	// Check the requirements
+	if err := govcms.CheckRequirements(); err != nil {
+		// Customize the error message with the error on the next line
+		return fmt.Errorf("System requirements check failed:\n%v", err)
+	}
+	return nil
 }

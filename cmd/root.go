@@ -25,11 +25,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var appConfig settings.Config // Rename config to appConfig
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -63,6 +65,14 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Load configuration settings from settings.go
+	var err error
+	appConfig, err = settings.LoadConfig()
+	if err != nil {
+		fmt.Println("Error loading configuration:", err)
+		os.Exit(1)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)

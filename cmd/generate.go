@@ -22,20 +22,41 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Ensures Docker images for GovCMS services are up to date",
-	Long:  "Ensures Docker images for GovCMS services are up to date.",
+// generateCmd represents the generate command
+var generateCmd = &cobra.Command{
+	Use:       "generate [resource]",
+	Short:     "Creates a GovCMS distribution tailored for either SaaS or PaaS deployment",
+	Long:      "Creates a GovCMS distribution tailored for either SaaS or PaaS deployment.",
+	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: []string{"distribution", "saas", "paas"},
 	Run: func(cmd *cobra.Command, args []string) {
-		govcms.Update()
+		// Check if both flags are provided
+		if cmd.Flags().Changed("pr") && cmd.Flags().Changed("branch") {
+			fmt.Println("Error: Cannot specify both --pr and --branch flags together.")
+			return
+		}
+		resource := args[0]
+		prNumber, _ := cmd.Flags().GetInt("pr")
+		branchName, _ := cmd.Flags().GetString("branch")
+
+		// Call the generate function from the govcms package
+		err := govcms.Generate(resource, prNumber, branchName)
+		if err != nil {
+			fmt.Printf("Error generating %s: %v\n", resource, err)
+			return
+		}
+
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(generateCmd)
+	generateCmd.Flags().IntP("pr", "p", 0, "Github PR number")
+	generateCmd.Flags().StringP("branch", "b", "", "Git branch name")
 }

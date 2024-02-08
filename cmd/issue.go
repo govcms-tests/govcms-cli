@@ -22,20 +22,25 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/govcms-tests/govcms-cli/pkg/govcms"
+	"fmt"
+
+	"github.com/govcms-tests/govcms-cli/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Ensures Docker images for GovCMS services are up to date",
-	Long:  "Ensures Docker images for GovCMS services are up to date.",
+// issueCmd represents the issue command
+var issueCmd = &cobra.Command{
+	Use:   "issue",
+	Short: "Open a new issue on the GovCMS GitHub repository",
+	Long:  "Open a new issue on the GovCMS GitHub repository.",
 	Run: func(cmd *cobra.Command, args []string) {
-		govcms.Update()
+		url := "https://github.com/govCMS/GovCMS/issues/new/choose"
+		if err := utils.OpenBrowser(url); err != nil {
+			fmt.Printf("Error opening browser for URL: %s\nError: %v\n", url, err)
+		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(issueCmd)
 }

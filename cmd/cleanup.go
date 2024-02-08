@@ -26,16 +26,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Ensures Docker images for GovCMS services are up to date",
-	Long:  "Ensures Docker images for GovCMS services are up to date.",
+// cleanupCmd represents the cleanup command
+var cleanupCmd = &cobra.Command{
+	Use:   "cleanup",
+	Short: "Cleanup GovCMS local development environment",
 	Run: func(cmd *cobra.Command, args []string) {
-		govcms.Update()
+		govcms.Stop()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(cleanupCmd)
 }
