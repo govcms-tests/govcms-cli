@@ -56,6 +56,28 @@ var generateCmd = &cobra.Command{
 			return
 		}
 
+		pathErr := os.Mkdir("govcms", os.ModePerm)
+		if pathErr != nil {
+			fmt.Println("Invalid path")
+			return
+		}
+		// Define the target folder where repositories will be cloned
+		targetFolder := "govcms"
+		// Clone the corresponding repository
+		repoURL := map[string]string{
+			"distribution": "govCMS/GovCMS",
+			"saas":         "govCMS/scaffold",
+			"paas":         "govCMS/scaffold",
+		}[resource]
+		repoPath := filepath.Join(targetFolder, resource)
+		fmt.Printf("Cloning %s into %s\n", repoURL, repoPath)
+		_, err := git.PlainClone(repoPath, false, &git.CloneOptions{
+			URL:      "https://github.com/" + repoURL + ".git",
+			Progress: os.Stdout,
+		})
+		if err != nil && err != git.ErrRepositoryAlreadyExists {
+			fmt.Printf("Error cloning repository: %s\n", err)
+		}
 	},
 }
 
