@@ -45,6 +45,11 @@ var generateCmd = &cobra.Command{
 			return
 		}
 
+		pathErr := os.Mkdir("govcms", os.ModePerm)
+		if pathErr != nil {
+			fmt.Println("Invalid path")
+			return
+		}
 		// Define the target folder where repositories will be cloned
 		targetFolder := "govcms"
 		// Clone the corresponding repository
