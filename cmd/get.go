@@ -3,12 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/go-git/go-git/v5"
 	"github.com/govcms-tests/govcms-cli/data"
+	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
-
-	"github.com/go-git/go-git/v5"
-	"github.com/spf13/cobra"
 )
 
 // getCmd represents the get command
@@ -56,8 +55,15 @@ var getCmd = &cobra.Command{
 		}
 
 		absPath, err := filepath.Abs(targetFolder)
-		data.InsertInstall(name, absPath, resource)
 
+		res, _ := data.StringToInstallation(resource)
+
+		install := data.Installation{
+			Name:     name,
+			Path:     absPath,
+			Resource: res,
+		}
+		data.InsertInstall(install)
 	},
 }
 
