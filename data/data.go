@@ -14,6 +14,7 @@ var DB_PATH = "/Users/jackfuller/dev/build/test/govcms.db"
 var db *sql.DB
 
 func Connect() {
+
 	err := OpenDatabase()
 	if err != nil {
 		log.Fatal("Unable to connect to DB")
@@ -42,9 +43,10 @@ func SyncInstallations() {
 
 func CreateTable() {
 	createTableSQL := `CREATE TABLE IF NOT EXISTS installations (
+    	"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     	"name" TEXT UNIQUE NOT NULL,
-    	"path" TEXT PRIMARY KEY NOT NULL,
-    	"type" INTEGER NOT NULL
+    	"path" TEXT NOT NULL,
+    	"type" TEXT NOT NULL
 	);`
 
 	statement, err := db.Prepare(createTableSQL)
@@ -56,13 +58,13 @@ func CreateTable() {
 	log.Println("Installations table created")
 }
 
-func InsertInstallation(install Installation) {
+func InsertInstall(name string, path string, installType string) {
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
 	statement, err := db.Prepare(insertInstallSQL)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	_, err = statement.Exec(install.Name, install.Path, install.Resource)
+	_, err = statement.Exec(name, path, installType)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -134,10 +136,4 @@ func DirExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
-}
-
-func InsertInstallations(installs []Installation) {
-	for _, install := range installs {
-		InsertInstallation(install)
-	}
 }
