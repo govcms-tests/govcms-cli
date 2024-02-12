@@ -21,8 +21,13 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/govcms-tests/govcms-cli/cmd"
+import (
+	"github.com/govcms-tests/govcms-cli/cmd"
+	"github.com/govcms-tests/govcms-cli/data"
+)
 
 func main() {
+	data.Connect()
+
 	cmd.Execute()
 }
