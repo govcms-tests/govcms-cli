@@ -63,7 +63,7 @@ var getCmd = &cobra.Command{
 			Path:     absPath,
 			Resource: res,
 		}
-		data.InsertInstall(install)
+		data.InsertInstallation(install)
 	},
 }
 

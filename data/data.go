@@ -5,10 +5,8 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 var DB_PATH = "/Users/jackfuller/dev/build/test/govcms.db"
@@ -44,9 +42,8 @@ func SyncInstallations() {
 
 func CreateTable() {
 	createTableSQL := `CREATE TABLE IF NOT EXISTS installations (
-    	"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     	"name" TEXT UNIQUE NOT NULL,
-    	"path" TEXT NOT NULL,
+    	"path" TEXT PRIMARY KEY NOT NULL,
     	"type" INTEGER NOT NULL
 	);`
 
@@ -59,7 +56,7 @@ func CreateTable() {
 	log.Println("Installations table created")
 }
 
-func InsertInstall(install Installation) {
+func InsertInstallation(install Installation) {
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
 	statement, err := db.Prepare(insertInstallSQL)
 	if err != nil {
@@ -139,20 +136,8 @@ func DirExists(path string) (bool, error) {
 	return false, err
 }
 
-func findAllInstallPaths(root string) []string {
-	var allPaths []string
-
-	filepath.WalkDir(root, func(path string, file fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if file.Name() == "govcms.info.yml" {
-			absPath, _ := filepath.Abs(file.Name())
-			parentDir := filepath.Dir(absPath)
-			allPaths = append(allPaths, parentDir)
-			return filepath.SkipDir
-		}
-		return nil
-	})
-	return allPaths
+func InsertInstallations(installs []Installation) {
+	for _, install := range installs {
+		InsertInstallation(install)
+	}
 }
