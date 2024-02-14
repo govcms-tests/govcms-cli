@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/data"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
 	"os"

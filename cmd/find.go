@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/data"
+	data2 "github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/spf13/cobra"
 	"io/fs"
 	"path/filepath"
@@ -27,7 +27,7 @@ var findCmd = &cobra.Command{
 		fmt.Println(strings.Join(FindAllInstallPaths(specifiedPath), "\n"))
 
 		allInstalls := findAllInstallations(specifiedPath)
-		data.InsertInstallations(allInstalls)
+		data2.InsertInstallations(allInstalls)
 	},
 }
 
@@ -53,13 +53,13 @@ func FindAllInstallPaths(root string) []string {
 	return allPaths
 }
 
-func findAllInstallations(rootPath string) []data.Installation {
-	var allInstalls []data.Installation
+func findAllInstallations(rootPath string) []data2.Installation {
+	var allInstalls []data2.Installation
 	allPaths := FindAllInstallPaths(rootPath)
 	for _, path := range allPaths {
 		name := filepath.Base(path)
-		res := data.DISTRIBUTION
-		install := data.Installation{Name: name, Path: path, Resource: res}
+		res := data2.DISTRIBUTION
+		install := data2.Installation{Name: name, Path: path, Resource: res}
 		allInstalls = append(allInstalls, install)
 	}
 	return allInstalls
