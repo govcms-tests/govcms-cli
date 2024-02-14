@@ -15,10 +15,7 @@ import (
 )
 
 func Generate(resource string, prNumber int, branchName string) error {
-	// Validate the provided PR number
-	if prNumber < 0 {
-		return fmt.Errorf("PR number must be a positive integer")
-	}
+	validateFlags(prNumber, branchName)
 
 	// Load configuration from settings.go
 	appConfig, err := settings.LoadConfig()
@@ -50,16 +47,7 @@ func Generate(resource string, prNumber int, branchName string) error {
 	} else {
 		name = resource
 	}
-	//if branchName != "" {
-	//	// If a branch name is provided, set repoPath to the branch name folder
-	//	repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_branch_%s", resource, branchName))
-	//} else if prNumber != 0 {
-	//	// If a PR number is provided, clone to a folder with resource name plus PR number
-	//	repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_pr_%d", resource, prNumber))
-	//} else {
-	//	// If no PR number is provided, clone to a folder with just the resource name
-	//	repoPath = filepath.Join(govcmsFolder, resource)
-	//}
+
 	repoPath = filepath.Join(govcmsFolder, name)
 
 	// Print the cloning message
@@ -138,5 +126,13 @@ func Generate(resource string, prNumber int, branchName string) error {
 		fmt.Println("Default branch cloned successfully!")
 	}
 
+	return nil
+}
+
+func validateFlags(prNumber int, branch string) error {
+	// Validate the provided PR number
+	if prNumber < 0 {
+		return fmt.Errorf("PR number must be a positive integer")
+	}
 	return nil
 }
