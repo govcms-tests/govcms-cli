@@ -2,6 +2,7 @@ package govcms
 
 import (
 	"fmt"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"os"
 	"path/filepath"
 
@@ -41,16 +42,25 @@ func Generate(resource string, prNumber int, branchName string) error {
 
 	// Clone the corresponding repository
 	var repoPath string
+	var name string
 	if branchName != "" {
-		// If a branch name is provided, set repoPath to the branch name folder
-		repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_branch_%s", resource, branchName))
+		name = fmt.Sprintf("%s_branch_%s", resource, branchName)
 	} else if prNumber != 0 {
-		// If a PR number is provided, clone to a folder with resource name plus PR number
-		repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_pr_%d", resource, prNumber))
+		name = fmt.Sprintf("%s_pr_%d", resource, prNumber)
 	} else {
-		// If no PR number is provided, clone to a folder with just the resource name
-		repoPath = filepath.Join(govcmsFolder, resource)
+		name = resource
 	}
+	//if branchName != "" {
+	//	// If a branch name is provided, set repoPath to the branch name folder
+	//	repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_branch_%s", resource, branchName))
+	//} else if prNumber != 0 {
+	//	// If a PR number is provided, clone to a folder with resource name plus PR number
+	//	repoPath = filepath.Join(govcmsFolder, fmt.Sprintf("%s_pr_%d", resource, prNumber))
+	//} else {
+	//	// If no PR number is provided, clone to a folder with just the resource name
+	//	repoPath = filepath.Join(govcmsFolder, resource)
+	//}
+	repoPath = filepath.Join(govcmsFolder, name)
 
 	// Print the cloning message
 	fmt.Printf("Cloning %s into %s\n", repoURL, repoPath)
@@ -60,6 +70,9 @@ func Generate(resource string, prNumber int, branchName string) error {
 		URL:      "https://github.com/" + repoURL + ".git",
 		Progress: os.Stdout,
 	})
+
+	res, _ := data.StringToResource(resource)
+	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 
 	// Handle errors
 	if err != nil && err != git.ErrRepositoryAlreadyExists {

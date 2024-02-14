@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	data2 "github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"os"
 	"path/filepath"
 
@@ -56,9 +56,9 @@ var getCmd = &cobra.Command{
 		}
 
 		absPath, err := filepath.Abs(targetFolder)
-		res, _ := data2.StringToInstallation(resource)
+		res, _ := data.StringToResource(resource)
 
-		data2.InsertInstallation(data2.Installation{Name: name, Path: absPath, Resource: res})
+		data.InsertInstallation(data.Installation{Name: name, Path: absPath, Resource: res})
 
 	},
 }
