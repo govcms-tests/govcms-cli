@@ -71,7 +71,7 @@ var generateCmd = &cobra.Command{
 		}[resource]
 		repoPath := filepath.Join(targetFolder, resource)
 		fmt.Printf("Cloning %s into %s\n", repoURL, repoPath)
-		_, err := git.PlainClone(repoPath, false, &git.CloneOptions{
+		_, err = git.PlainClone(repoPath, false, &git.CloneOptions{
 			URL:      "https://github.com/" + repoURL + ".git",
 			Progress: os.Stdout,
 		})

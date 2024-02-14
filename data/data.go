@@ -4,49 +4,63 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
 )
 
-var DB_PATH = "/Users/jackfuller/dev/build/test/govcms.db"
-
 var db *sql.DB
 
-func Connect() {
-
-	err := OpenDatabase()
-	if err != nil {
-		log.Fatal("Unable to connect to DB")
-		return
-	}
+func Initialise() {
+	Connect()
+	CreateTables()
 	SyncInstallations()
 }
 
-func OpenDatabase() error {
-	var err error
-
-	db, err = sql.Open("sqlite3", DB_PATH)
+func Connect() error {
+	err := OpenDatabase()
 	if err != nil {
-		return err
+		log.Fatal("Unable to connect to DB")
 	}
+	return err
+}
 
+func OpenDatabase() error {
+	createDatabaseIfNotExist()
+	var err error
+	db, err = sql.Open("sqlite3", getDatabasePath())
+	if err != nil {
+		log.Fatal(err)
+	}
 	return db.Ping()
 }
 
-func SyncInstallations() {
-	listOfPaths := GetListOfPaths()
-	for _, path := range listOfPaths {
-		RemovePathIfMissing(path)
-	}
+func createDatabaseIfNotExist() {
+	db, _ := sql.Open("sqlite3", getDatabasePath())
+	defer db.Close()
+
+	dbName := ".govcms.db"
+	db.Exec("CREATE DATABASE IF NOT EXISTS " + dbName)
 }
 
-func CreateTable() {
+func getDatabasePath() string {
+	config, _ := settings.LoadConfig()
+	return config.Database
+}
+
+func CreateTables() {
+	CreateInstallationTables()
+}
+
+func CreateInstallationTables() {
+	if TableExists("installations") {
+		return
+	}
 	createTableSQL := `CREATE TABLE IF NOT EXISTS installations (
-    	"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     	"name" TEXT UNIQUE NOT NULL,
-    	"path" TEXT NOT NULL,
-    	"type" TEXT NOT NULL
+    	"path" TEXT PRIMARY KEY NOT NULL,
+    	"type" INTEGER NOT NULL
 	);`
 
 	statement, err := db.Prepare(createTableSQL)
@@ -58,13 +72,23 @@ func CreateTable() {
 	log.Println("Installations table created")
 }
 
-func InsertInstall(name string, path string, installType string) {
+func SyncInstallations() {
+	listOfPaths := GetListOfPaths()
+	for _, path := range listOfPaths {
+		RemovePathIfMissing(path)
+	}
+}
+
+func InsertInstallation(install Installation) {
+	if InstallationExists(install) {
+		return
+	}
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
 	statement, err := db.Prepare(insertInstallSQL)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	_, err = statement.Exec(name, path, installType)
+	_, err = statement.Exec(install.Name, install.Path, install.Resource)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -136,4 +160,38 @@ func DirExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func InsertInstallations(installs []Installation) {
+	for _, install := range installs {
+		InsertInstallation(install)
+	}
+}
+
+func InstallationExists(install Installation) bool {
+	query := `SELECT path FROM installations WHERE path = ?`
+	err := db.QueryRow(query, install.Path).Scan(&install.Path)
+	if err == nil {
+		return true
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		// Real error happened
+		log.Print(err)
+	}
+	// No row was found
+	return false
+}
+
+func TableExists(table string) bool {
+	query := `SELECT name FROM sqlite_master WHERE type='table' AND name=?`
+	err := db.QueryRow(query, table).Scan(&table)
+	if err == nil {
+		return true
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		// Real error happened
+		log.Print(err)
+	}
+	// No row was found
+	return false
 }

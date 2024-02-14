@@ -13,6 +13,7 @@ type Config struct {
 	Workspace string            `yaml:"workspace"` // The project workspace
 	OS        string            `yaml:"os"`        // Operating system information
 	Tokens    map[string]string `yaml:"tokens"`    // Access tokens for various services
+	Database  string            `yaml:"database"`  // The local database
 }
 
 // LoadConfig loads the configuration from the specified YAML file
@@ -61,14 +62,17 @@ func createDefaultConfig(homeDir string, cfg *Config) error {
 		"Gitlab": "---",
 		"Docker": "---",
 	}
-
 	// Set default workspace directory
 	cfg.Workspace = filepath.Join(homeDir, "govcms")
+
+	// Set default SQLite database file location
+	cfg.Database = filepath.Join(homeDir, ".govcms.db")
 
 	// Set the default tokens and workspace in the viper instance
 	viper.Set("tokens", cfg.Tokens)
 	viper.Set("workspace", cfg.Workspace)
 	viper.Set("os", utils.GetOperatingSystem())
+	viper.Set("database", cfg.Database)
 
 	// Write the configuration to file
 	configFilePath := filepath.Join(homeDir, ".govcms-cli.yaml")

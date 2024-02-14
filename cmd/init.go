@@ -10,7 +10,7 @@ var initCmd = &cobra.Command{
 	Short: "Initialise GovCMS CLI database",
 	Long:  "Initialise GovCMS CLI database",
 	Run: func(cmd *cobra.Command, args []string) {
-		data.CreateTable()
+		data.CreateInstallationTables()
 	},
 }
 

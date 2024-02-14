@@ -27,7 +27,6 @@ import (
 )
 
 func main() {
-	data.Connect()
-
+	data.Initialise()
 	cmd.Execute()
 }
