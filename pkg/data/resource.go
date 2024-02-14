@@ -26,7 +26,7 @@ var (
 	}
 )
 
-func StringToInstallation(str string) (Resource, bool) {
+func StringToResource(str string) (Resource, bool) {
 	resource, ok := resourceMap[strings.ToLower(str)]
 	return resource, ok
 }

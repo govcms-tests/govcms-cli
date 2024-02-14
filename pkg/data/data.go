@@ -58,8 +58,9 @@ func CreateInstallationTables() {
 	if TableExists("installations") {
 		return
 	}
+	log.Println("Creating table 'installations'")
 	createTableSQL := `CREATE TABLE IF NOT EXISTS installations (
-    	"name" TEXT UNIQUE NOT NULL,
+    	"name" TEXT NOT NULL,
     	"path" TEXT PRIMARY KEY NOT NULL,
     	"type" INTEGER NOT NULL
 	);`
