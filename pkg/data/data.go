@@ -16,6 +16,7 @@ func Initialise() {
 	Connect()
 	CreateTables()
 	SyncInstallations()
+	fmt.Println("Using database " + getDatabasePath())
 }
 
 func Connect() error {

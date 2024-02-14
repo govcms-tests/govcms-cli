@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/govcms-tests/govcms-cli/data"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/spf13/cobra"
 )
 

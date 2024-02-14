@@ -23,7 +23,7 @@ package main
 
 import (
 	"github.com/govcms-tests/govcms-cli/cmd"
-	"github.com/govcms-tests/govcms-cli/data"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 )
 
 func main() {
