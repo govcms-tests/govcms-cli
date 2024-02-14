@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	data2 "github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/cobra"
 	"io/fs"
 	"path/filepath"
@@ -22,12 +23,12 @@ var findCmd = &cobra.Command{
 		} else {
 			specifiedPath = args[0]
 		}
+		allInstalls := findAllInstallations(specifiedPath)
 
 		fmt.Println("Found GovCMS installations at:")
 		fmt.Println(strings.Join(FindAllInstallPaths(specifiedPath), "\n"))
 
-		allInstalls := findAllInstallations(specifiedPath)
-		data2.InsertInstallations(allInstalls)
+		data.InsertInstallations(allInstalls)
 	},
 }
 
@@ -37,29 +38,35 @@ func init() {
 
 func FindAllInstallPaths(root string) []string {
 	var allPaths []string
+	recursiveSearchForGovcms(root, &allPaths)
+	// Then check specified govcms workspace folder
+	cfg, _ := settings.LoadConfig()
+	recursiveSearchForGovcms(cfg.Workspace, &allPaths)
+	return allPaths
+}
 
-	_ = filepath.WalkDir(root, func(path string, file fs.DirEntry, err error) error {
+func recursiveSearchForGovcms(root string, allPaths *[]string) {
+	filepath.WalkDir(root, func(path string, file fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if file.Name() == "govcms.info.yml" {
 			parentDir := filepath.Dir(path)
 			absPath, _ := filepath.Abs(parentDir)
-			allPaths = append(allPaths, absPath)
+			*allPaths = append(*allPaths, absPath)
 			return filepath.SkipDir
 		}
 		return nil
 	})
-	return allPaths
 }
 
-func findAllInstallations(rootPath string) []data2.Installation {
-	var allInstalls []data2.Installation
+func findAllInstallations(rootPath string) []data.Installation {
+	var allInstalls []data.Installation
 	allPaths := FindAllInstallPaths(rootPath)
 	for _, path := range allPaths {
 		name := filepath.Base(path)
-		res := data2.DISTRIBUTION
-		install := data2.Installation{Name: name, Path: path, Resource: res}
+		res := data.DISTRIBUTION
+		install := data.Installation{Name: name, Path: path, Resource: res}
 		allInstalls = append(allInstalls, install)
 	}
 	return allInstalls
