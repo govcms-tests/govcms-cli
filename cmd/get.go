@@ -1,16 +1,15 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/manifoldco/promptui"
-	"os"
-	"path/filepath"
+	"strings"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
 )
+
+var cmd cobra.Command
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -20,64 +19,77 @@ var getCmd = &cobra.Command{
 	//Args:      cobra.MatchAll(cobra.ExactArgs(2), cobra.OnlyValidArgs),
 	//ValidArgs: []string{"distribution", "saas", "paas"},
 	Run: func(cmd *cobra.Command, args []string) {
+		if hasBothFlags() {
+			fmt.Println("Error: Cannot specify both --pr and --branch flags together.")
+			return
+		}
 		if len(args) < 2 {
-			prompt := promptui.Prompt{
-				Label: "What would you like to call this installation?",
-			}
-
-			result, err := prompt.Run()
-			if err != nil {
-				fmt.Printf("Prompt failed %v\n", err)
-				return
-			}
-			fmt.Printf("You chose %q\n", result)
+			getGovcmsWithPrompt()
 			return
 		}
-
-		// Validate the provided resource type
-		resource := args[0]
-		name := args[1]
-		if resource != "distribution" && resource != "saas" && resource != "paas" {
-			fmt.Println("Invalid resource type. Must be 'distribution', 'saas', or 'paas'")
-			return
-		}
-
-		pathErr := os.Mkdir(name, os.ModePerm)
-		if pathErr != nil {
-			fmt.Println("Invalid path")
-			return
-		}
-		// Define the target folder where repositories will be cloned
-		targetFolder := name
-		// Clone the corresponding repository
-		repoURL := map[string]string{
-			"distribution": "govCMS/GovCMS",
-			"saas":         "govCMS/scaffold",
-			"paas":         "govCMS/scaffold",
-		}[resource]
-		fmt.Printf("Cloning %s into %s\n", repoURL, targetFolder)
-		_, err := git.PlainClone(targetFolder, false, &git.CloneOptions{
-			URL:      "https://github.com/" + repoURL + ".git",
-			Progress: os.Stdout,
-		})
-		if errors.Is(err, git.ErrRepositoryAlreadyExists) {
-			fmt.Print("A repository with that name already exists")
-			return
-		}
-
-		if err != nil {
-			fmt.Printf("Error cloning repository: %s\n", err)
-			return
-		}
-
-		absPath, err := filepath.Abs(targetFolder)
-		res, _ := data.StringToResource(resource)
-
-		data.InsertInstallation(data.Installation{Name: name, Path: absPath, Resource: res})
-
+		getGovcmsWithoutPrompt(args)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
+}
+
+func hasBothFlags() bool {
+	return cmd.Flags().Changed("pr") && cmd.Flags().Changed("branch")
+}
+
+func getGovcmsWithPrompt() {
+	name, govcmsType := getDetailsFromPrompt()
+	err := govcms.Generate(name, govcmsType, 0, "")
+	if err != nil {
+		fmt.Printf("Error generating %s: %v\n", govcmsType, err)
+		return
+	}
+}
+
+func getDetailsFromPrompt() (string, string) {
+	name := getNameFromPrompt()
+	govcmsType := getTypeFromPrompt()
+	return name, govcmsType
+}
+
+func getNameFromPrompt() string {
+	prompt := promptui.Prompt{
+		Label: "What would you like to call this installation?",
+	}
+	name, err := prompt.Run()
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		panic(err)
+	}
+	fmt.Printf("You chose %q\n", name)
+	return name
+}
+
+func getTypeFromPrompt() string {
+	prompt := promptui.Select{
+		Label: "Which type would you like to install?",
+		Items: []string{"Distribution", "SaaS", "PaaS", "Lagoon", "Tests", "Scaffold-Tooling"},
+	}
+	_, govcmsType, err := prompt.Run()
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		panic(err)
+	}
+	fmt.Printf("You choose %q\n", govcmsType)
+	return strings.ToLower(govcmsType)
+}
+
+func getGovcmsWithoutPrompt(args []string) {
+	govcmsType := args[0]
+	name := args[1]
+	prNumber, _ := cmd.Flags().GetInt("pr")
+	branchName, _ := cmd.Flags().GetString("branch")
+	// Call the generate function from the govcms package
+	err := govcms.Generate(name, govcmsType, prNumber, branchName)
+	if err != nil {
+		fmt.Printf("Error generating %s: %v\n", govcmsType, err)
+		return
+	}
 }

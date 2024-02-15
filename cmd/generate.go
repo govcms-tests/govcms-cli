@@ -23,7 +23,7 @@ package cmd
 
 import (
 	"fmt"
-
+	"github.com/dchest/uniuri"
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +46,7 @@ var generateCmd = &cobra.Command{
 		branchName, _ := cmd.Flags().GetString("branch")
 
 		// Call the generate function from the govcms package
-		err := govcms.Generate(resource, prNumber, branchName)
+		err := govcms.Generate(uniuri.NewLen(5), resource, prNumber, branchName)
 		if err != nil {
 			fmt.Printf("Error generating %s: %v\n", resource, err)
 			return

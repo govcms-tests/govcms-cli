@@ -10,6 +10,9 @@ const (
 	DISTRIBUTION Resource = iota
 	SAAS
 	PAAS
+	LAGOON
+	TESTS
+	SCAFFOLD_TOOLING
 )
 
 type Installation struct {
@@ -20,9 +23,13 @@ type Installation struct {
 
 var (
 	resourceMap = map[string]Resource{
-		"distribution": DISTRIBUTION,
-		"saas":         SAAS,
-		"paas":         PAAS,
+		"distribution":     DISTRIBUTION,
+		"saas":             SAAS,
+		"paas":             PAAS,
+		"lagoon":           LAGOON,
+		"tests":            TESTS,
+		"scaffold":         SCAFFOLD_TOOLING,
+		"scaffold-tooling": SCAFFOLD_TOOLING,
 	}
 )
 
