@@ -52,5 +52,5 @@ func init() {
 	rootCmd.AddCommand(guiCmd)
 
 	// Define the flag for the port option
-	guiCmd.Flags().StringP("port", "p", "3000", "Port number")
+	guiCmd.Flags().StringP("port", "p", "8888", "Port number")
 }

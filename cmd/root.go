@@ -23,11 +23,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log/slog"
+	"os"
 )
 
 var cfgFile string
@@ -35,9 +35,10 @@ var appConfig settings.Config // Rename config to appConfig
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "govcms",
-	Short: "Lift the GovCMS local development",
-	Long:  "Lift the GovCMS local development",
+	Use:     "govcms",
+	Short:   "Lift the GovCMS local development",
+	Long:    "Lift the GovCMS local development",
+	Version: "v0.1.0 -- HEAD",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -47,6 +48,7 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+
 }
 
 func init() {
@@ -58,9 +60,13 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.govcms-cli.yaml)")
 
+	// Set '--version' flag template
+	rootCmd.SetVersionTemplate("GovCMS CLI version " + rootCmd.Version + "\n")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -91,6 +97,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		slog.Debug("Using config file:", viper.ConfigFileUsed())
 	}
 }
