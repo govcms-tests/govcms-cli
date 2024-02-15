@@ -14,7 +14,9 @@ import (
 	"github.com/govcms-tests/govcms-cli/pkg/utils"
 )
 
-func Generate(resource string, prNumber int, branchName string) error {
+func Generate(name string, resource string, prNumber int, branchName string) error {
+	fmt.Println("Getting GovCMS clone with directory name " + name)
+
 	validateFlags(prNumber, branchName)
 
 	// Load configuration from settings.go
@@ -39,13 +41,10 @@ func Generate(resource string, prNumber int, branchName string) error {
 
 	// Clone the corresponding repository
 	var repoPath string
-	var name string
 	if branchName != "" {
 		name = fmt.Sprintf("%s_branch_%s", resource, branchName)
 	} else if prNumber != 0 {
 		name = fmt.Sprintf("%s_pr_%d", resource, prNumber)
-	} else {
-		name = resource
 	}
 
 	repoPath = filepath.Join(govcmsFolder, name)
