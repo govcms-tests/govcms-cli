@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/manifoldco/promptui"
 	"os"
 	"path/filepath"
 
@@ -19,6 +20,20 @@ var getCmd = &cobra.Command{
 	//Args:      cobra.MatchAll(cobra.ExactArgs(2), cobra.OnlyValidArgs),
 	//ValidArgs: []string{"distribution", "saas", "paas"},
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			prompt := promptui.Prompt{
+				Label: "What would you like to call this installation?",
+			}
+
+			result, err := prompt.Run()
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+			fmt.Printf("You chose %q\n", result)
+			return
+		}
+
 		// Validate the provided resource type
 		resource := args[0]
 		name := args[1]

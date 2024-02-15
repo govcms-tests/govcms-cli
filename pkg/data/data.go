@@ -16,33 +16,30 @@ func Initialise() {
 	Connect()
 	CreateTables()
 	SyncInstallations()
-	fmt.Println("Using database " + getDatabasePath())
 }
 
 func Connect() error {
 	err := OpenDatabase()
-	if err != nil {
-		log.Fatal("Unable to connect to DB")
-	}
+	checkError(err)
 	return err
 }
 
 func OpenDatabase() error {
-	createDatabaseIfNotExist()
+	dbPath := getDatabasePath()
+	createFileIfNotExist(dbPath)
+
 	var err error
-	db, err = sql.Open("sqlite3", getDatabasePath())
-	if err != nil {
-		log.Fatal(err)
-	}
+	db, err = sql.Open("sqlite3", dbPath)
+	checkError(err)
 	return db.Ping()
 }
 
-func createDatabaseIfNotExist() {
-	db, _ := sql.Open("sqlite3", getDatabasePath())
-	defer db.Close()
-
-	dbName := ".govcms.db"
-	db.Exec("CREATE DATABASE IF NOT EXISTS " + dbName)
+func createFileIfNotExist(path string) {
+	if _, err := os.Stat(path); err != nil {
+		file, err := os.Create(path)
+		checkError(err)
+		file.Close()
+	}
 }
 
 func getDatabasePath() string {
@@ -66,10 +63,7 @@ func CreateInstallationTables() {
 	);`
 
 	statement, err := db.Prepare(createTableSQL)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
+	checkError(err)
 	statement.Exec()
 	log.Println("Installations table created")
 }
@@ -87,26 +81,18 @@ func InsertInstallation(install Installation) {
 	}
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
 	statement, err := db.Prepare(insertInstallSQL)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 	_, err = statement.Exec(install.Name, install.Path, install.Resource)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 	log.Println("Inserted installation successfully!")
 }
 
 func RemoveInstall(path string) {
 	deleteSQL := `DELETE FROM installations where path=?`
 	statement, err := db.Prepare(deleteSQL)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 	_, err = statement.Exec(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 }
 
 func GetInstallPath(name string) string {
@@ -114,13 +100,9 @@ func GetInstallPath(name string) string {
 
 	selectInstallSQL := `SELECT path FROM installations WHERE name=?`
 	statement, err := db.Prepare(selectInstallSQL)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 	err = statement.QueryRow(name).Scan(&path)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	checkError(err)
 
 	return path
 }
@@ -196,4 +178,10 @@ func TableExists(table string) bool {
 	}
 	// No row was found
 	return false
+}
+
+func checkError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

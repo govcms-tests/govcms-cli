@@ -9,7 +9,7 @@ import (
 // Start will start the HTTP server on the specified port, defaulting to 3000 if not provided
 func Start(port string) {
 	if port == "" {
-		port = "3000" // Set default port to 3000
+		port = "8888" // Set default port to 3000
 	}
 
 	http.HandleFunc("/", homePageHandler)

@@ -2,10 +2,10 @@ package config
 
 import "sort"
 
-// Define a type to represent your configuration
+// ReposList Define a type to represent your configuration
 type ReposList map[string]string
 
-// Initialize the govcms repositories list with the initial values
+// GovCMSReposList Initialize the govcms repositories list with the initial values
 var GovCMSReposList = ReposList{
 	"distribution":     "govCMS/GovCMS",
 	"saas":             "govCMS/scaffold",
