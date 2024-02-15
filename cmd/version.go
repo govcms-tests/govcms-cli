@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -33,10 +31,12 @@ var versionCmd = &cobra.Command{
 	Short: "Displays the currently installed version",
 	Long:  "Displays the currently installed version of the GovCMS command-line tool.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("v0.1.0 -- HEAD")
+		version := "v0.1.0 -- HEAD"
+
+		cmd.Print(version)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(versionCmd)
+	RootCmd.AddCommand(versionCmd)
 }

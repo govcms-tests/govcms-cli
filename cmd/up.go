@@ -68,6 +68,6 @@ var downCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(upCmd)
-	rootCmd.AddCommand(downCmd)
+	RootCmd.AddCommand(upCmd)
+	RootCmd.AddCommand(downCmd)
 }

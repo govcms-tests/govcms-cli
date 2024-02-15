@@ -39,10 +39,10 @@ var requirementsCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(requirementsCmd)
+	RootCmd.AddCommand(requirementsCmd)
 
 	// Register the persistent pre-run function
-	rootCmd.PersistentPreRunE = preRun
+	RootCmd.PersistentPreRunE = preRun
 }
 
 func preRun(cmd *cobra.Command, args []string) error {

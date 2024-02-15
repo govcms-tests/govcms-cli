@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/manifoldco/promptui"
-	"strings"
-
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var cmd cobra.Command
@@ -32,7 +31,7 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(getCmd)
+	RootCmd.AddCommand(getCmd)
 }
 
 func hasBothFlags() bool {
