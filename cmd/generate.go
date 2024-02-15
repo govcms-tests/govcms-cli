@@ -56,7 +56,7 @@ var generateCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(generateCmd)
+	RootCmd.AddCommand(generateCmd)
 	generateCmd.Flags().IntP("pr", "p", 0, "Github PR number")
 	generateCmd.Flags().StringP("branch", "b", "", "Git branch name")
 }

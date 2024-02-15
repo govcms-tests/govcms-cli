@@ -76,7 +76,7 @@ func SyncInstallations() {
 }
 
 func InsertInstallation(install Installation) {
-	if InstallationExists(install) {
+	if DoesInstallationExist(install) {
 		return
 	}
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
@@ -152,7 +152,7 @@ func InsertInstallations(installs []Installation) {
 	}
 }
 
-func InstallationExists(install Installation) bool {
+func DoesInstallationExist(install Installation) bool {
 	query := `SELECT path FROM installations WHERE path = ?`
 	err := db.QueryRow(query, install.Path).Scan(&install.Path)
 	if err == nil {

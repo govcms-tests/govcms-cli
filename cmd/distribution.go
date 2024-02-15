@@ -84,6 +84,6 @@ var distributionCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(distributionCmd)
+	RootCmd.AddCommand(distributionCmd)
 	distributionCmd.Flags().StringP("path", "p", ".", "Path to GovCMS distribution folder")
 }
