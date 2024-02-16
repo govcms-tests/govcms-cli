@@ -13,49 +13,48 @@ import (
 	"github.com/govcms-tests/govcms-cli/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-var cmd cobra.Command
+//var cmd cobra.Command
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get [resource] [name]",
 	Short: "get a GovCMS distribution, saas, or paas site",
 	Long:  "get a GovCMS distribution, saas, or paas site.",
-	//Args:      cobra.MatchAll(cobra.ExactArgs(2), cobra.OnlyValidArgs),
-	//ValidArgs: []string{"distribution", "saas", "paas"},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if hasBothFlags() {
-			return fmt.Errorf("Error: Cannot specify both --pr and --branch flags together.")
+		if hasBothFlags(cmd) {
+			return fmt.Errorf("cannot specify both --pr and --branch flags together")
 		}
 		if len(args) < 2 {
-			getGovcmsWithPrompt()
-			return nil
+			err := getGovcmsWithPrompt()
+			return err
 		}
-		err := getGovcmsWithoutPrompt(args)
+		err := getGovcmsWithoutPrompt(cmd, args)
 		return err
 	},
 }
 
 func init() {
-	//RootCmd.AddCommand(getCmd)
+	getCmd.Flags().IntP("pr", "p", 0, "Github PR number")
+	getCmd.Flags().StringP("branch", "b", "", "Git branch name")
 }
 
-func hasBothFlags() bool {
-	return cmd.Flags().Changed("pr") && cmd.Flags().Changed("branch")
+func hasBothFlags(cmd *cobra.Command) bool {
+	prNumber, _ := cmd.Flags().GetInt("pr")
+	branch, _ := cmd.Flags().GetString("branch")
+	log.Printf("Flags: pr - %v, branch - %v", prNumber, branch)
+	return prNumber != 0 && branch != ""
 }
 
 func getGovcmsWithPrompt() error {
 	name, govcmsType := getDetailsFromPrompt()
 	err := Generate(name, govcmsType, 0, "")
 	return err
-	//if err != nil {
-	//	fmt.Printf("Error generating %s: %v\n", govcmsType, err)
-	//	return
-	//}
 }
 
 func getDetailsFromPrompt() (string, string) {
@@ -91,7 +90,7 @@ func getTypeFromPrompt() string {
 	return strings.ToLower(govcmsType)
 }
 
-func getGovcmsWithoutPrompt(args []string) error {
+func getGovcmsWithoutPrompt(cmd *cobra.Command, args []string) error {
 	govcmsType := args[0]
 	name := args[1]
 	prNumber, _ := cmd.Flags().GetInt("pr")
@@ -99,17 +98,15 @@ func getGovcmsWithoutPrompt(args []string) error {
 	// Call the generate function from the govcms package
 	err := Generate(name, govcmsType, prNumber, branchName)
 	return err
-
-	//if err != nil {
-	//	fmt.Printf("Error generating %s: %v\n", govcmsType, err)
-	//	return
-	//}
 }
 
 func Generate(name string, govcmsType string, prNumber int, branchName string) error {
 	fmt.Printf("Cloning repo type %s as %s with PR=%v and Branch %v. \n", govcmsType, name, prNumber, branchName)
 
-	validateFlags(prNumber, branchName)
+	err := validateFlags(prNumber, branchName)
+	if err != nil {
+		return err
+	}
 
 	// Load configuration from settings.go
 	appConfig, err := settings.LoadConfig()
@@ -144,18 +141,13 @@ func Generate(name string, govcmsType string, prNumber int, branchName string) e
 	// Print the cloning message
 	fmt.Printf("Cloning %s into %s\n", repoURL, repoPath)
 
-	billyFS := utils.NewBillyFromAfero(AppFs, repoPath)
+	memoryStorage := memory.NewStorage()
+	abstractFilesystemAtRepoPath := utils.NewBillyFromAfero(AppFs, repoPath)
 
-	_, err = git.Clone(memory.NewStorage(), billyFS, &git.CloneOptions{
+	_, err = git.Clone(memoryStorage, abstractFilesystemAtRepoPath, &git.CloneOptions{
 		URL:      "https://github.com/" + repoURL + ".git",
 		Progress: os.Stdout,
 	})
-
-	//// Clone the repository
-	//_, err = git.PlainClone(repoPath, false, &git.CloneOptions{
-	//	URL:      "https://github.com/" + repoURL + ".git",
-	//	Progress: os.Stdout,
-	//})
 
 	if errors.Is(err, git.ErrRepositoryAlreadyExists) {
 		return fmt.Errorf("repository with this name already exists at this location")
@@ -166,19 +158,20 @@ func Generate(name string, govcmsType string, prNumber int, branchName string) e
 		return fmt.Errorf("error cloning repository: %s", err)
 	}
 
+	fmt.Println("This print statement is executed")
 	res, _ := data.StringToResource(govcmsType)
 	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 
 	// Create local branch if needed
 	if branchName != "" {
-		err = utils.CreateLocalBranchIfNeeded(repoPath, branchName)
+		err = utils.CreateLocalBranchIfNeeded(memoryStorage, abstractFilesystemAtRepoPath, branchName)
 		if err != nil {
 			return fmt.Errorf("error creating local branch: %s", err)
 		}
 		fmt.Println("Branch cloned successfully!")
 	} else if prNumber != 0 {
 		// Open the repository
-		r, err := git.PlainOpen(repoPath)
+		r, err := git.Open(memoryStorage, abstractFilesystemAtRepoPath)
 		if err != nil {
 			return fmt.Errorf("error opening repository: %s", err)
 		}

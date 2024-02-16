@@ -2,14 +2,16 @@ package utils
 
 import (
 	"fmt"
+	"github.com/go-git/go-billy/v5"
+	"github.com/go-git/go-git/v5/storage"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-func CreateLocalBranchIfNeeded(repoPath, branchName string) error {
+func CreateLocalBranchIfNeeded(memoryStorage storage.Storer, abstractFilesystemAtRepoPath billy.Filesystem, branchName string) error {
 	// Open the repository
-	repo, err := git.PlainOpen(repoPath)
+	repo, err := git.Open(memoryStorage, abstractFilesystemAtRepoPath)
 	if err != nil {
 		return fmt.Errorf("error opening repository: %s", err)
 	}
