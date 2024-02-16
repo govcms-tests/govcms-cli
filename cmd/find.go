@@ -32,9 +32,9 @@ var findCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	RootCmd.AddCommand(findCmd)
-}
+//func init() {
+//	RootCmd.AddCommand(findCmd)
+//}
 
 func FindAllInstallPaths(root string) []string {
 	var allPaths []string

@@ -24,9 +24,16 @@ package main
 import (
 	"github.com/govcms-tests/govcms-cli/cmd"
 	"github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/spf13/afero"
+	"os"
 )
 
 func main() {
 	data.Initialise()
-	cmd.Execute()
+
+	rootCmd := cmd.NewRootCmd(afero.NewOsFs())
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }

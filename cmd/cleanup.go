@@ -35,6 +35,6 @@ var cleanupCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	RootCmd.AddCommand(cleanupCmd)
-}
+//func init() {
+//	RootCmd.AddCommand(cleanupCmd)
+//}
