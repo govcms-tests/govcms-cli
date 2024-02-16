@@ -1,8 +1,8 @@
 package govcms
 
 import (
+	"errors"
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"os"
 	"path/filepath"
 
@@ -10,12 +10,13 @@ import (
 	gitconfig "github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/govcms-tests/govcms-cli/pkg/config"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/govcms-tests/govcms-cli/pkg/utils"
 )
 
-func Generate(name string, resource string, prNumber int, branchName string) error {
-	fmt.Println("Getting GovCMS clone with directory name " + name)
+func Generate(name string, govcmsType string, prNumber int, branchName string) error {
+	fmt.Printf("Cloning repo type %s as %s with PR=%v and Branch %v. \n", govcmsType, name, prNumber, branchName)
 
 	validateFlags(prNumber, branchName)
 
@@ -34,17 +35,17 @@ func Generate(name string, resource string, prNumber int, branchName string) err
 	govcmsFolder := filepath.Join(appConfig.Workspace)
 
 	// Get the repository URL from the repos package
-	repoURL, ok := config.GovCMSReposList[resource]
+	repoURL, ok := config.GovCMSReposList[govcmsType]
 	if !ok {
-		return fmt.Errorf("invalid resource type")
+		return fmt.Errorf("invalid govcmsType type")
 	}
 
 	// Clone the corresponding repository
 	var repoPath string
 	if branchName != "" {
-		name = fmt.Sprintf("%s_branch_%s", resource, branchName)
+		name = fmt.Sprintf("%s_branch_%s", govcmsType, branchName)
 	} else if prNumber != 0 {
-		name = fmt.Sprintf("%s_pr_%d", resource, prNumber)
+		name = fmt.Sprintf("%s_pr_%d", govcmsType, prNumber)
 	}
 
 	repoPath = filepath.Join(govcmsFolder, name)
@@ -58,13 +59,17 @@ func Generate(name string, resource string, prNumber int, branchName string) err
 		Progress: os.Stdout,
 	})
 
-	res, _ := data.StringToResource(resource)
-	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
+	if errors.Is(err, git.ErrRepositoryAlreadyExists) {
+		return fmt.Errorf("repository with this name already exists at this location")
+	}
 
 	// Handle errors
-	if err != nil && err != git.ErrRepositoryAlreadyExists {
+	if err != nil {
 		return fmt.Errorf("error cloning repository: %s", err)
 	}
+
+	res, _ := data.StringToResource(govcmsType)
+	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 
 	// Create local branch if needed
 	if branchName != "" {

@@ -49,7 +49,7 @@ var guiCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(guiCmd)
+	//RootCmd.AddCommand(guiCmd)
 
 	// Define the flag for the port option
 	guiCmd.Flags().StringP("port", "p", "8888", "Port number")

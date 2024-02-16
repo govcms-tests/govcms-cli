@@ -33,10 +33,6 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		version := "v0.1.0 -- HEAD"
 
-		cmd.Print(version)
+		cmd.Println(version)
 	},
-}
-
-func init() {
-	RootCmd.AddCommand(versionCmd)
 }
