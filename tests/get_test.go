@@ -1,12 +1,12 @@
 package tests
 
 import (
-	"bytes"
+	"fmt"
 	"github.com/govcms-tests/govcms-cli/cmd"
 	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"io"
+	"strings"
 	"testing"
 )
 
@@ -27,6 +27,7 @@ func Test_InvalidFlagValues(t *testing.T) {
 	// PR flag cannot be less than zero
 	_, err := executeCommand(rootCmd, "get", "distribution", "test-site", "--pr=-1")
 	assert.Error(t, err)
+	assert.True(t, strings.Contains(fmt.Sprint(err), "PR number must be a positive integer"))
 }
 
 func Test_InvalidResourceType(t *testing.T) {
@@ -68,33 +69,8 @@ func Test_ValidGetWithBranchFlag(t *testing.T) {
 func Test_ValidGetWithPrompt(t *testing.T) {
 	rootCmd := cmd.NewRootCmd(afero.NewMemMapFs())
 
-	addInputsToPromptReader(&cmd.Reader, "testSite\n", "distribution\n")
+	addInputsToPromptReader(&cmd.Reader, "testSite", "distribution")
 
 	_, err := executeCommand(rootCmd, "get")
 	assert.NoError(t, err)
-}
-
-// Sets up a reader of type io.ReadCloser with the correct buffer of string arguments
-// so that it can be fed to PromptUI's input reader.
-// See https://stackoverflow.com/a/69505423
-func addInputsToPromptReader(reader *io.ReadCloser, args ...string) {
-	var b *bytes.Buffer
-	for index, arg := range args {
-		if index == 0 {
-			b = bytes.NewBuffer([]byte(arg))
-			pad(len(arg), b)
-			*reader = io.NopCloser(b)
-			continue
-		}
-		b.WriteString(arg)
-		pad(len(arg), b)
-	}
-}
-
-func pad(siz int, buf *bytes.Buffer) {
-	pu := make([]byte, 4096-siz)
-	for i := 0; i < 4096-siz; i++ {
-		pu[i] = 97
-	}
-	buf.Write(pu)
 }
