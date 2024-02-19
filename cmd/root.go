@@ -54,7 +54,7 @@ func NewRootCmd(appFs afero.Fs) *cobra.Command {
 	cmd.AddCommand(distributionCmd)
 	cmd.AddCommand(findCmd)
 	//cmd.AddCommand(generateCmd)
-	cmd.AddCommand(getCmd)
+	cmd.AddCommand(NewGetCmd())
 	cmd.AddCommand(guiCmd)
 	cmd.AddCommand(initCmd)
 	cmd.AddCommand(issueCmd)

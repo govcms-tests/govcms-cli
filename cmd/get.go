@@ -19,30 +19,52 @@ import (
 	"strings"
 )
 
-//var cmd cobra.Command
-
-// getCmd represents the get command
-var getCmd = &cobra.Command{
-	Use:   "get [resource] [name]",
-	Short: "get a GovCMS distribution, saas, or paas site",
-	Long:  "get a GovCMS distribution, saas, or paas site.",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if hasBothFlags(cmd) {
-			return fmt.Errorf("cannot specify both --pr and --branch flags together")
-		}
-		if len(args) < 2 {
-			err := getGovcmsWithPrompt()
+func NewGetCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get [resource] [name]",
+		Short: "get a GovCMS distribution, saas, or paas site",
+		Long:  "get a GovCMS distribution, saas, or paas site.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if hasBothFlags(cmd) {
+				return fmt.Errorf("cannot specify both --pr and --branch flags together")
+			}
+			if len(args) < 2 {
+				err := getGovcmsWithPrompt()
+				return err
+			}
+			err := getGovcmsWithoutPrompt(cmd, args)
 			return err
-		}
-		err := getGovcmsWithoutPrompt(cmd, args)
-		return err
-	},
+		},
+	}
+
+	cmd.Flags().IntP("pr", "p", 0, "Github PR number")
+	cmd.Flags().StringP("branch", "b", "", "Git branch name")
+
+	return cmd
 }
 
-func init() {
-	getCmd.Flags().IntP("pr", "p", 0, "Github PR number")
-	getCmd.Flags().StringP("branch", "b", "", "Git branch name")
-}
+//// getCmd represents the get command
+//var getCmd = &cobra.Command{
+//	Use:   "get [resource] [name]",
+//	Short: "get a GovCMS distribution, saas, or paas site",
+//	Long:  "get a GovCMS distribution, saas, or paas site.",
+//	RunE: func(cmd *cobra.Command, args []string) error {
+//		if hasBothFlags(cmd) {
+//			return fmt.Errorf("cannot specify both --pr and --branch flags together")
+//		}
+//		if len(args) < 2 {
+//			err := getGovcmsWithPrompt()
+//			return err
+//		}
+//		err := getGovcmsWithoutPrompt(cmd, args)
+//		return err
+//	},
+//}
+
+//func init() {
+//	getCmd.Flags().IntP("pr", "p", 0, "Github PR number")
+//	getCmd.Flags().StringP("branch", "b", "", "Git branch name")
+//}
 
 func hasBothFlags(cmd *cobra.Command) bool {
 	prNumber, _ := cmd.Flags().GetInt("pr")
