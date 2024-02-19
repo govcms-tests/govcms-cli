@@ -47,7 +47,7 @@ package cmd
 //		branchName, _ := cmd.Flags().GetString("branch")
 //
 //		// Call the generate function from the govcms package
-//		err := govcms.Generate(uniuri.NewLen(5), resource, prNumber, branchName)
+//		err := govcms.CloneGovCMS(uniuri.NewLen(5), resource, prNumber, branchName)
 //		if err != nil {
 //			fmt.Printf("Error generating %s: %v\n", resource, err)
 //			return
