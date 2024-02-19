@@ -13,58 +13,43 @@ import (
 	"github.com/govcms-tests/govcms-cli/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+// Reader that allows for mocking interactions with the terminal, which is needed to test getGovcmsWithPrompt(),
+// default is os.Stdin
+var Reader io.ReadCloser
+
 func NewGetCmd() *cobra.Command {
+	Reader = os.Stdin
+
 	cmd := &cobra.Command{
 		Use:   "get [resource] [name]",
 		Short: "get a GovCMS distribution, saas, or paas site",
 		Long:  "get a GovCMS distribution, saas, or paas site.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if hasBothFlags(cmd) {
-				return fmt.Errorf("cannot specify both --pr and --branch flags together")
-			}
-			if len(args) < 2 {
-				err := getGovcmsWithPrompt()
-				return err
-			}
-			err := getGovcmsWithoutPrompt(cmd, args)
-			return err
-		},
+		RunE:  runGetCommand,
 	}
-
 	cmd.Flags().IntP("pr", "p", 0, "Github PR number")
 	cmd.Flags().StringP("branch", "b", "", "Git branch name")
 
 	return cmd
 }
 
-//// getCmd represents the get command
-//var getCmd = &cobra.Command{
-//	Use:   "get [resource] [name]",
-//	Short: "get a GovCMS distribution, saas, or paas site",
-//	Long:  "get a GovCMS distribution, saas, or paas site.",
-//	RunE: func(cmd *cobra.Command, args []string) error {
-//		if hasBothFlags(cmd) {
-//			return fmt.Errorf("cannot specify both --pr and --branch flags together")
-//		}
-//		if len(args) < 2 {
-//			err := getGovcmsWithPrompt()
-//			return err
-//		}
-//		err := getGovcmsWithoutPrompt(cmd, args)
-//		return err
-//	},
-//}
-
-//func init() {
-//	getCmd.Flags().IntP("pr", "p", 0, "Github PR number")
-//	getCmd.Flags().StringP("branch", "b", "", "Git branch name")
-//}
+func runGetCommand(cmd *cobra.Command, args []string) error {
+	if hasBothFlags(cmd) {
+		return fmt.Errorf("cannot specify both --pr and --branch flags together")
+	}
+	if len(args) < 2 {
+		err := getGovcmsWithPrompt()
+		return err
+	}
+	err := getGovcmsWithoutPrompt(cmd, args)
+	return err
+}
 
 func hasBothFlags(cmd *cobra.Command) bool {
 	prNumber, _ := cmd.Flags().GetInt("pr")
@@ -88,6 +73,7 @@ func getDetailsFromPrompt() (string, string) {
 func getNameFromPrompt() string {
 	prompt := promptui.Prompt{
 		Label: "What would you like to call this installation?",
+		Stdin: Reader,
 	}
 	name, err := prompt.Run()
 	if err != nil {
@@ -102,6 +88,7 @@ func getTypeFromPrompt() string {
 	prompt := promptui.Select{
 		Label: "Which type would you like to install?",
 		Items: []string{"Distribution", "SaaS", "PaaS", "Lagoon", "Tests", "Scaffold-Tooling"},
+		Stdin: Reader,
 	}
 	_, govcmsType, err := prompt.Run()
 	if err != nil {
@@ -180,7 +167,6 @@ func Generate(name string, govcmsType string, prNumber int, branchName string) e
 		return fmt.Errorf("error cloning repository: %s", err)
 	}
 
-	fmt.Println("This print statement is executed")
 	res, _ := data.StringToResource(govcmsType)
 	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 
