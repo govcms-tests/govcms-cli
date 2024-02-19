@@ -72,8 +72,8 @@ func NewRootCmd(appFs afero.Fs) *cobra.Command {
 	return cmd
 }
 
-func init() {
-}
+//func init() {
+//}
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
