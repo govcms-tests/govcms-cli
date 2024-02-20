@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
 	"os"
@@ -32,7 +31,7 @@ var upCmd = &cobra.Command{
 			name = args[0]
 		}
 
-		installPath = data.GetInstallPath(name)
+		installPath = local.GetInstallPath(name)
 		fmt.Println("Attempting to launch site located at " + installPath)
 
 		command := exec.Command("/bin/sh", "-c", "docker compose up -d")

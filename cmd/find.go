@@ -28,7 +28,7 @@ var findCmd = &cobra.Command{
 		fmt.Println("Found GovCMS installations at:")
 		fmt.Println(strings.Join(FindAllInstallPaths(specifiedPath), "\n"))
 
-		data.InsertInstallations(allInstalls)
+		local.InsertInstallations(allInstalls)
 	},
 }
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -14,9 +15,11 @@ import (
 var cfgFile string
 var appConfig settings.Config // Rename config to appConfig
 var AppFs afero.Fs
+var local data.LocalStorage
 
-func NewRootCmd(appFs afero.Fs) *cobra.Command {
+func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
 	AppFs = appFs
+	local = localStorage
 	cmd := &cobra.Command{
 		Use:     "govcms",
 		Short:   "Lift the GovCMS local development",
