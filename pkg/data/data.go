@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+// TODO Use an ORM such as SQLBoiler or GORP
+
 type LocalStorage struct {
 	db *sql.DB
 }

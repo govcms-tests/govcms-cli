@@ -17,7 +17,3 @@ var listCmd = &cobra.Command{
 		fmt.Println(strings.Join(local.GetListOfPaths(), "\n"))
 	},
 }
-
-func init() {
-	//RootCmd.AddCommand(listCmd)
-}
