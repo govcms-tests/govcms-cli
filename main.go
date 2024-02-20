@@ -29,7 +29,6 @@ import (
 )
 
 func main() {
-
 	db, _ := data.CreateDatabaseIfNotExist()
 	localStorage := data.Initialise(db)
 

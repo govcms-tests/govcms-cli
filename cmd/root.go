@@ -28,34 +28,34 @@ func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
 	}
 	cobra.OnInitialize(initConfig)
 
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.govcms-cli.yaml)")
+	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Set config file, default is $HOME/.govcms-cli.yaml")
 	cmd.SetVersionTemplate("GovCMS CLI version " + cmd.Version + "\n")
 	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+	cmd.AddCommand(versionCmd)
+	cmd.AddCommand(NewGetCmd())
+	cmd.AddCommand(upCmd)
+	cmd.AddCommand(downCmd)
+
+	cmd.AddCommand(checkCmd)
 	cmd.AddCommand(cleanupCmd)
 	cmd.AddCommand(distributionCmd)
 	cmd.AddCommand(findCmd)
-	//cmd.AddCommand(generateCmd)
-	cmd.AddCommand(NewGetCmd())
+
 	cmd.AddCommand(guiCmd)
 	cmd.AddCommand(initCmd)
 	cmd.AddCommand(issueCmd)
 	cmd.AddCommand(listCmd)
-	cmd.AddCommand(requirementsCmd)
+
 	cmd.AddCommand(testCmd)
-	cmd.AddCommand(upCmd)
-	cmd.AddCommand(downCmd)
+
 	cmd.AddCommand(updateCmd)
-	cmd.AddCommand(versionCmd)
 
 	// Register the persistent pre-run function
 	cmd.PersistentPreRunE = preRun
 
 	return cmd
 }
-
-//func init() {
-//}
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {

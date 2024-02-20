@@ -12,9 +12,9 @@ func NewGetCmd() *cobra.Command {
 	Reader = os.Stdin
 
 	cmd := &cobra.Command{
-		Use:   "get [resource] [name]",
-		Short: "get a GovCMS distribution, saas, or paas site",
-		Long:  "get a GovCMS distribution, saas, or paas site.",
+		Use:   "get",
+		Short: "Clone a GovCMS distribution, saas, or paas site",
+		Long:  "Clone a GovCMS distribution, saas, or paas site",
 		RunE:  runGetCommand,
 	}
 	cmd.Flags().IntP("pr", "p", 0, "Github PR number")
