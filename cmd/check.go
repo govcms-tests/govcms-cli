@@ -19,30 +19,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package cmd
 
 import (
 	"fmt"
-
 	"github.com/govcms-tests/govcms-cli/pkg/govcms"
 	"github.com/spf13/cobra"
 )
 
-// requirementsCmd represents the requirements command
-var requirementsCmd = &cobra.Command{
-	Use:    "requirements",
+// checkCmd represents the requirements command
+var checkCmd = &cobra.Command{
+	Use:    "check",
 	Short:  "Check system requirements before running commands",
-	Hidden: true, // Hide this command from help messages
-	Run: func(cmd *cobra.Command, args []string) {
-		govcms.CheckRequirements()
+	Hidden: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := govcms.CheckRequirements(); err != nil {
+			// Customize the error message with the error on the next line
+			return fmt.Errorf("System requirements check failed:\n%v", err)
+		}
+		fmt.Println("All system requirements met!")
+		return nil
 	},
-}
-
-func init() {
-	//RootCmd.AddCommand(requirementsCmd)
-
-	// Register the persistent pre-run function
-	//RootCmd.PersistentPreRunE = preRun
 }
 
 func preRun(cmd *cobra.Command, args []string) error {

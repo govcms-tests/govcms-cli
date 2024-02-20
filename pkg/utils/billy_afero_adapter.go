@@ -9,8 +9,6 @@ import (
 	"sync"
 )
 
-//package fsadapter
-
 const (
 	defaultDirectoryMode = 0755
 	defaultCreateMode    = 0666
@@ -21,6 +19,9 @@ type AdapterFs struct {
 	fs afero.Fs
 }
 
+/*
+NewBillyFromAfero converts an Afero filesystem to a Billy filesystem
+*/
 func NewBillyFromAfero(fs afero.Fs, basePath string) billy.Filesystem {
 	return chroot.New(&AdapterFs{fs}, basePath)
 }
