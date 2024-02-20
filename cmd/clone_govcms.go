@@ -95,7 +95,6 @@ func getGovcmsRepoPath(name string, prNumber int, branchName string) string {
 		name += fmt.Sprintf("_pr_%d", prNumber)
 	}
 	fullPath := filepath.Join(govcmsFolder, name)
-	fmt.Println(fullPath)
 	return fullPath
 }
 

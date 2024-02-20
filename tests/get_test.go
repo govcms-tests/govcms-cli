@@ -16,8 +16,9 @@ import (
 var local data.LocalStorage
 
 func init() {
+	// TODO create database in the mocked file system
 	if _, err := os.Stat("test.db"); err == nil {
-		os.Remove("test.db")
+		_ = os.Remove("test.db")
 	}
 	db, _ := sql.Open("sqlite3", "test.db")
 	local = data.Initialise(db)
