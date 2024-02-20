@@ -10,28 +10,21 @@ import (
 	"os"
 )
 
-var db *sql.DB
-
-func Initialise() {
-	Connect()
-	CreateTables()
-	SyncInstallations()
+type LocalStorage struct {
+	db *sql.DB
 }
 
-func Connect() error {
-	err := OpenDatabase()
-	checkError(err)
-	return err
-}
-
-func OpenDatabase() error {
+func CreateDatabaseIfNotExist() (*sql.DB, error) {
 	dbPath := getDatabasePath()
 	createFileIfNotExist(dbPath)
-
-	var err error
-	db, err = sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite3", dbPath)
 	checkError(err)
-	return db.Ping()
+	return db, db.Ping()
+}
+
+func getDatabasePath() string {
+	config, _ := settings.LoadConfig()
+	return config.Database
 }
 
 func createFileIfNotExist(path string) {
@@ -42,64 +35,72 @@ func createFileIfNotExist(path string) {
 	}
 }
 
-func getDatabasePath() string {
-	config, _ := settings.LoadConfig()
-	return config.Database
+func Initialise(db *sql.DB) LocalStorage {
+	local, _ := Connect(db)
+	local.CreateTables()
+	local.SyncInstallations()
+	return local
 }
 
-func CreateTables() {
-	CreateInstallationTables()
+func Connect(db *sql.DB) (LocalStorage, error) {
+	local := LocalStorage{db: db}
+	return local, db.Ping()
 }
 
-func CreateInstallationTables() {
-	if TableExists("installations") {
+func (local *LocalStorage) CreateTables() {
+	local.CreateInstallationTables()
+}
+
+func (local *LocalStorage) CreateInstallationTables() {
+	if local.TableExists("installations") {
 		return
 	}
 	log.Println("Creating table 'installations'")
 	createTableSQL := `CREATE TABLE IF NOT EXISTS installations (
-    	"name" TEXT NOT NULL,
+    	"name" TEXT UNIQUE NOT NULL,
     	"path" TEXT PRIMARY KEY NOT NULL,
     	"type" INTEGER NOT NULL
 	);`
 
-	statement, err := db.Prepare(createTableSQL)
+	statement, err := local.db.Prepare(createTableSQL)
 	checkError(err)
 	statement.Exec()
 	log.Println("Installations table created")
 }
 
-func SyncInstallations() {
-	listOfPaths := GetListOfPaths()
+func (local *LocalStorage) SyncInstallations() {
+	listOfPaths := local.GetListOfPaths()
 	for _, path := range listOfPaths {
-		RemovePathIfMissing(path)
+		local.RemovePathIfMissing(path)
 	}
 }
 
-func InsertInstallation(install Installation) {
-	if DoesInstallationExist(install) {
-		return
+func (local *LocalStorage) InsertInstallation(install Installation) error {
+	if local.DoesInstallationExist(install) {
+		return errors.New("an installation already exists with this name")
 	}
 	insertInstallSQL := `INSERT INTO installations(name, path, type) VALUES (?, ?, ?)`
-	statement, err := db.Prepare(insertInstallSQL)
+	statement, err := local.db.Prepare(insertInstallSQL)
 	checkError(err)
 	_, err = statement.Exec(install.Name, install.Path, install.Resource)
 	checkError(err)
 	log.Println("Inserted installation successfully!")
+	return nil
 }
 
-func RemoveInstall(path string) {
+func (local *LocalStorage) RemoveInstall(path string) {
 	deleteSQL := `DELETE FROM installations where path=?`
-	statement, err := db.Prepare(deleteSQL)
+	statement, err := local.db.Prepare(deleteSQL)
 	checkError(err)
 	_, err = statement.Exec(path)
 	checkError(err)
 }
 
-func GetInstallPath(name string) string {
+func (local *LocalStorage) GetInstallPath(name string) string {
 	var path string
 
 	selectInstallSQL := `SELECT path FROM installations WHERE name=?`
-	statement, err := db.Prepare(selectInstallSQL)
+	statement, err := local.db.Prepare(selectInstallSQL)
 	checkError(err)
 	err = statement.QueryRow(name).Scan(&path)
 	checkError(err)
@@ -107,11 +108,11 @@ func GetInstallPath(name string) string {
 	return path
 }
 
-func GetListOfPaths() []string {
+func (local *LocalStorage) GetListOfPaths() []string {
 	var listOfPaths []string
 
 	selectSQL := `SELECT path FROM installations`
-	statement, err := db.Prepare(selectSQL)
+	statement, err := local.db.Prepare(selectSQL)
 	if err != nil {
 		fmt.Println("Error executing query:", err)
 		return listOfPaths
@@ -129,9 +130,9 @@ func GetListOfPaths() []string {
 	return listOfPaths
 }
 
-func RemovePathIfMissing(path string) {
+func (local *LocalStorage) RemovePathIfMissing(path string) {
 	if exists, _ := DirExists(path); !exists {
-		RemoveInstall(path)
+		local.RemoveInstall(path)
 	}
 }
 
@@ -146,15 +147,15 @@ func DirExists(path string) (bool, error) {
 	return false, err
 }
 
-func InsertInstallations(installs []Installation) {
+func (local *LocalStorage) InsertInstallations(installs []Installation) {
 	for _, install := range installs {
-		InsertInstallation(install)
+		local.InsertInstallation(install)
 	}
 }
 
-func DoesInstallationExist(install Installation) bool {
+func (local *LocalStorage) DoesInstallationExist(install Installation) bool {
 	query := `SELECT path FROM installations WHERE path = ?`
-	err := db.QueryRow(query, install.Path).Scan(&install.Path)
+	err := local.db.QueryRow(query, install.Path).Scan(&install.Path)
 	if err == nil {
 		return true
 	}
@@ -166,9 +167,9 @@ func DoesInstallationExist(install Installation) bool {
 	return false
 }
 
-func TableExists(table string) bool {
+func (local *LocalStorage) TableExists(table string) bool {
 	query := `SELECT name FROM sqlite_master WHERE type='table' AND name=?`
-	err := db.QueryRow(query, table).Scan(&table)
+	err := local.db.QueryRow(query, table).Scan(&table)
 	if err == nil {
 		return true
 	}

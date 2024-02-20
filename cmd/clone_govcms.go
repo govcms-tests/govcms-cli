@@ -40,7 +40,7 @@ func CloneGovCMS(name string, govcmsType string, branchName string, prNumber int
 	}
 
 	// Construct the folder path within the workspace
-	repoPath := getGovcmsRepoPath(govcmsType, prNumber, branchName)
+	repoPath := getGovcmsRepoPath(name, prNumber, branchName)
 	repoURL, err := getGovcmsURL(govcmsType)
 	if err != nil {
 		return err
@@ -57,7 +57,10 @@ func CloneGovCMS(name string, govcmsType string, branchName string, prNumber int
 
 	// Add to database
 	res, _ := data.StringToResource(govcmsType)
-	data.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
+	err = local.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -83,15 +86,17 @@ func loadConfiguration() error {
 	return nil
 }
 
-func getGovcmsRepoPath(govcmsType string, prNumber int, branchName string) string {
+func getGovcmsRepoPath(name string, prNumber int, branchName string) string {
 	govcmsFolder := filepath.Join(appConfig.Workspace)
-	var name string
+
 	if branchName != "" {
-		name = fmt.Sprintf("%s_branch_%s", govcmsType, branchName)
+		name += fmt.Sprintf("_branch_%s", branchName)
 	} else if prNumber != 0 {
-		name = fmt.Sprintf("%s_pr_%d", govcmsType, prNumber)
+		name += fmt.Sprintf("_pr_%d", prNumber)
 	}
-	return filepath.Join(govcmsFolder, name)
+	fullPath := filepath.Join(govcmsFolder, name)
+	fmt.Println(fullPath)
+	return fullPath
 }
 
 func getGovcmsURL(govcmsType string) (string, error) {
