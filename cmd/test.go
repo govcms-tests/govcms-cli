@@ -24,6 +24,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/govcms-tests/govcms-cli/pkg/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -35,6 +36,7 @@ var testCmd = &cobra.Command{
 	Long:  `Run tests.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
+		utils.CreateContainer()
 	},
 }
 
