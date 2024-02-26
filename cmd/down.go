@@ -10,11 +10,15 @@ import (
 var downCmd = &cobra.Command{
 	Use:   "down",
 	Short: "Stop docker container",
-	Run: func(cmd *cobra.Command, arg []string) {
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
 		var so saveOutput
+		name := args[0]
+
+		installPath := local.GetInstallPath(name)
 
 		command := exec.Command("/bin/sh", "-c", "docker compose down")
-		command.Dir = "govcms/distribution"
+		command.Dir = installPath
 
 		command.Stdin = os.Stdin
 		command.Stdout = &so
