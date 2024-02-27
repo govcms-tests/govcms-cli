@@ -55,8 +55,8 @@ func Up(cmd *cobra.Command, args []string) {
 }
 
 func setRandomPort(path string) error {
-	port := getFreePort(49152, 65535)
-	replaceCmd := "sed -i \"\" -E \"s/[0-9]+:80/" + strconv.Itoa(port) + ":80/g\" docker-compose.yml"
+	//port := getFreePort(49152, 65535)
+	replaceCmd := "sed -i \"\" -E \"s/[0-9]+:80/" + strconv.Itoa(0) + ":80/g\" docker-compose.yml"
 
 	cmd := exec.Command("bash")
 	cmd.Stdin = strings.NewReader(replaceCmd)

@@ -32,6 +32,8 @@ func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
 	cmd.SetVersionTemplate("GovCMS CLI version " + cmd.Version + "\n")
 	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+	cmd.AddCommand(whereCmd)
+
 	cmd.AddCommand(versionCmd)
 	cmd.AddCommand(NewGetCmd())
 	cmd.AddCommand(upCmd)
