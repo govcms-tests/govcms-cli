@@ -1,8 +1,9 @@
 package cmd
 
 import (
+	database "database-sqlc"
+	"database/sql"
 	"fmt"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -15,11 +16,11 @@ import (
 var cfgFile string
 var appConfig settings.Config // Rename config to appConfig
 var AppFs afero.Fs
-var local data.LocalStorage
+var installationManager *database.InstallationManager
 
-func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
+func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 	AppFs = appFs
-	local = localStorage
+	installationManager = database.NewInstallationManager(db, appFs)
 	cmd := &cobra.Command{
 		Use:     "govcms",
 		Short:   "Lift the GovCMS local development",
@@ -46,7 +47,6 @@ func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
 	cmd.AddCommand(findCmd)
 
 	cmd.AddCommand(guiCmd)
-	cmd.AddCommand(initCmd)
 	cmd.AddCommand(issueCmd)
 	cmd.AddCommand(listCmd)
 

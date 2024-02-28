@@ -38,7 +38,7 @@ func Up(cmd *cobra.Command, args []string) {
 	name := args[0]
 
 	// Prepare command execution
-	installPath, err := local.GetInstallPath(name)
+	installPath, err := installationManager.GetPath(name)
 	if err != nil {
 		return
 	}

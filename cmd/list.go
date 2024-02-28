@@ -11,9 +11,10 @@ var listCmd = &cobra.Command{
 	Short: "List all locally installed GovCMS instances",
 	Long:  "List all locally installed GovCMS instances",
 	Run: func(cmd *cobra.Command, args []string) {
-		local.SyncInstallations()
+		installationManager.Sync()
 		fmt.Println("Found the following local instances:")
 		fmt.Println("============================")
-		fmt.Println(strings.Join(local.GetListOfPaths(), "\n"))
+		paths, _ := installationManager.GetAllPaths()
+		fmt.Println(strings.Join(paths, "\n"))
 	},
 }

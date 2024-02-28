@@ -30,9 +30,10 @@ import (
 
 func main() {
 	db, _ := data.CreateDatabaseIfNotExist()
-	localStorage := data.Initialise(db)
 
-	rootCmd := cmd.NewRootCmd(afero.NewOsFs(), localStorage)
+	//localStorage := data.Initialise(db)
+
+	rootCmd := cmd.NewRootCmd(afero.NewOsFs(), db)
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
