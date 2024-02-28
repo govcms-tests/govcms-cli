@@ -2,6 +2,10 @@ module github.com/govcms-tests/govcms-cli
 
 go 1.21.5
 
+replace (
+	database-sqlc => ./pkg/database
+)
+
 require (
 	github.com/containerd/containerd v1.7.13
 	github.com/dchest/uniuri v1.2.0

@@ -15,7 +15,7 @@ var downCmd = &cobra.Command{
 		var so saveOutput
 		name := args[0]
 
-		installPath, err := local.GetInstallPath(name)
+		installPath, err := installationManager.GetPath(name)
 		if err != nil {
 			return
 		}

@@ -16,9 +16,9 @@ const (
 )
 
 type Installation struct {
-	Name     string
-	Path     string
-	Resource Resource
+	Name string
+	Path string
+	Type string
 }
 
 var (

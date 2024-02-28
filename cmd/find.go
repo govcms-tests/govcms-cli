@@ -33,7 +33,13 @@ var findCmd = &cobra.Command{
 		fmt.Println("Found GovCMS installations at:")
 		fmt.Println(strings.Join(allInstallURLs, "\n"))
 
-		local.InsertInstallations(allInstalls)
+		for _, install := range allInstalls {
+			err := installationManager.CreateInstallation(install.Name, install.Path, install.Type)
+			if err != nil {
+				return
+			}
+		}
+
 	},
 }
 
@@ -67,8 +73,8 @@ func findAllInstallations(rootPath string) []data.Installation {
 	allPaths := FindAllInstallPaths(rootPath)
 	for _, path := range allPaths {
 		name := filepath.Base(path)
-		res := data.DISTRIBUTION
-		install := data.Installation{Name: name, Path: path, Resource: res}
+		res := "distribution"
+		install := data.Installation{Name: name, Path: path, Type: res}
 		allInstalls = append(allInstalls, install)
 	}
 	return allInstalls

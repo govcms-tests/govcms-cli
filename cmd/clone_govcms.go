@@ -8,7 +8,6 @@ import (
 	"github.com/go-git/go-git/v5/storage"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/govcms-tests/govcms-cli/pkg/config"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/govcms-tests/govcms-cli/pkg/utils"
 	"io"
@@ -56,8 +55,13 @@ func CloneGovCMS(name string, govcmsType string, branchName string, prNumber int
 	}
 
 	// Add to database
-	res, _ := data.StringToResource(govcmsType)
-	err = local.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
+	//res, _ := data.StringToResource(govcmsType)
+	err = installationManager.CreateInstallation(name, repoPath, govcmsType)
+	if err != nil {
+		return err
+	}
+
+	//err = local.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 	if err != nil {
 		return err
 	}

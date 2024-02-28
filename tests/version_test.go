@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Version(t *testing.T) {
-	rootCmd := cmd.NewRootCmd(afero.NewMemMapFs(), local)
+	rootCmd := cmd.NewRootCmd(afero.NewMemMapFs(), db)
 
 	actualOutput, _ := executeCommand(rootCmd, "version")
 	expectedOutput := "v0.1.0 -- HEAD\n"
