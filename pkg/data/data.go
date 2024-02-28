@@ -90,7 +90,7 @@ func (local *LocalStorage) InsertInstallation(install Installation) error {
 	return nil
 }
 
-func (local *LocalStorage) RemoveInstall(path string) {
+func (local *LocalStorage) RemoveInstallFromPath(path string) {
 	deleteSQL := `DELETE FROM installations where path=?`
 	statement, err := local.db.Prepare(deleteSQL)
 	checkError(err)
@@ -98,16 +98,28 @@ func (local *LocalStorage) RemoveInstall(path string) {
 	checkError(err)
 }
 
-func (local *LocalStorage) GetInstallPath(name string) string {
+func (local *LocalStorage) RemoveInstallFromName(path string) error {
+	deleteSQL := `DELETE FROM installations where name=?`
+	statement, err := local.db.Prepare(deleteSQL)
+	checkError(err)
+	_, err = statement.Exec(path)
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("no installation found with that name")
+	}
+	return err
+}
+
+func (local *LocalStorage) GetInstallPath(name string) (string, error) {
 	var path string
 
 	selectInstallSQL := `SELECT path FROM installations WHERE name=?`
 	statement, err := local.db.Prepare(selectInstallSQL)
 	checkError(err)
 	err = statement.QueryRow(name).Scan(&path)
-	checkError(err)
-
-	return path
+	if err != nil {
+		return "", err
+	}
+	return path, nil
 }
 
 func (local *LocalStorage) GetListOfPaths() []string {
@@ -134,7 +146,7 @@ func (local *LocalStorage) GetListOfPaths() []string {
 
 func (local *LocalStorage) RemovePathIfMissing(path string) {
 	if exists, _ := DirExists(path); !exists {
-		local.RemoveInstall(path)
+		local.RemoveInstallFromPath(path)
 	}
 }
 

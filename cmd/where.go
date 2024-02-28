@@ -12,7 +12,10 @@ var whereCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		installName := args[0]
-		installPath := local.GetInstallPath(installName)
+		installPath, err := local.GetInstallPath(installName)
+		if err != nil {
+			return
+		}
 		cmd.SetOut(os.Stdout)
 		cmd.Println(installPath)
 
