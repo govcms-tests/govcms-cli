@@ -24,18 +24,20 @@ var findCmd = &cobra.Command{
 			specifiedPath = args[0]
 		}
 		allInstalls := findAllInstallations(specifiedPath)
+		allInstallURLs := FindAllInstallPaths(specifiedPath)
 
+		if len(allInstallURLs) == 0 {
+			fmt.Println("No installations found.")
+			return
+		}
 		fmt.Println("Found GovCMS installations at:")
-		fmt.Println(strings.Join(FindAllInstallPaths(specifiedPath), "\n"))
+		fmt.Println(strings.Join(allInstallURLs, "\n"))
 
 		local.InsertInstallations(allInstalls)
 	},
 }
 
-//func init() {
-//	RootCmd.AddCommand(findCmd)
-//}
-
+// FindAllInstallPaths returns a list of absolute url strings of all locally stored GovCMS installations
 func FindAllInstallPaths(root string) []string {
 	var allPaths []string
 	recursiveSearchForGovcms(root, &allPaths)

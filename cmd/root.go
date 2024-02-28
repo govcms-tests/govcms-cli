@@ -33,6 +33,7 @@ func NewRootCmd(appFs afero.Fs, localStorage data.LocalStorage) *cobra.Command {
 	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	cmd.AddCommand(whereCmd)
+	cmd.AddCommand(removeCmd)
 
 	cmd.AddCommand(versionCmd)
 	cmd.AddCommand(NewGetCmd())

@@ -38,7 +38,10 @@ func Up(cmd *cobra.Command, args []string) {
 	name := args[0]
 
 	// Prepare command execution
-	installPath = local.GetInstallPath(name)
+	installPath, err := local.GetInstallPath(name)
+	if err != nil {
+		return
+	}
 	_ = setRandomPort(installPath)
 	command := exec.Command("/bin/sh", "-c", "docker compose up -d")
 	command.Dir = installPath

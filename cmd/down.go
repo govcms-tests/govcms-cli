@@ -15,7 +15,10 @@ var downCmd = &cobra.Command{
 		var so saveOutput
 		name := args[0]
 
-		installPath := local.GetInstallPath(name)
+		installPath, err := local.GetInstallPath(name)
+		if err != nil {
+			return
+		}
 
 		command := exec.Command("/bin/sh", "-c", "docker compose down")
 		command.Dir = installPath
