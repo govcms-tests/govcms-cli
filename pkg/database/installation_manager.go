@@ -21,11 +21,14 @@ CREATE TABLE IF NOT EXISTS installation_type (
   name TEXT PRIMARY KEY
 );`
 
-func NewDatabase(path string) *sql.DB {
+func NewDatabase(path string) (*sql.DB, error) {
 	if _, err := os.Stat(path); err != nil {
 		file, err := os.Create(path)
 		checkError(err)
-		file.Close()
+		err = file.Close()
+		if err != nil {
+			return nil, fmt.Errorf("error creating database")
+		}
 	}
 	db, err := sql.Open("sqlite3", path)
 	checkError(err)
@@ -36,7 +39,7 @@ func NewDatabase(path string) *sql.DB {
 	_, err = schemaStatement.Exec()
 	checkError(err)
 
-	return db
+	return db, nil
 }
 
 type InstallationManager struct {
