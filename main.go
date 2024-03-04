@@ -31,9 +31,13 @@ import (
 
 func main() {
 	config, _ := settings.LoadConfig()
-	db := database.NewDatabase(config.Database)
+	db, err := database.NewDatabase(config.Database)
+	if err != nil {
+		os.Exit(1)
+	}
+
 	rootCmd := cmd.NewRootCmd(afero.NewOsFs(), db)
-	err := rootCmd.Execute()
+	err = rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}

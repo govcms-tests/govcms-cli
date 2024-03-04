@@ -16,8 +16,7 @@ func setUp() *cobra.Command {
 	if _, err := os.Stat("test.db"); err == nil {
 		_ = os.Remove("test.db")
 	}
-	db = database.NewDatabase("test.db")
-
+	db, _ := database.NewDatabase("test.db")
 	rootCmd := cmd.NewRootCmd(afero.NewMemMapFs(), db)
 	return rootCmd
 }
