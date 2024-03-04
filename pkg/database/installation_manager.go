@@ -5,9 +5,39 @@ import (
 	"database-sqlc/database"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/spf13/afero"
 	"os"
 )
+
+const schema = `CREATE TABLE IF NOT EXISTS installations(
+    name TEXT PRIMARY KEY,
+    path TEXT UNIQUE NOT NULL,
+    type TEXT NOT NULL,
+    FOREIGN KEY (type) REFERENCES installation_type (name)
+);
+
+CREATE TABLE IF NOT EXISTS installation_type (
+  name TEXT PRIMARY KEY
+);`
+
+func NewDatabase(path string) *sql.DB {
+	if _, err := os.Stat(path); err != nil {
+		file, err := os.Create(path)
+		checkError(err)
+		file.Close()
+	}
+	db, err := sql.Open("sqlite3", path)
+	checkError(err)
+
+	schemaStatement, err := db.Prepare(schema)
+	checkError(err)
+
+	_, err = schemaStatement.Exec()
+	checkError(err)
+
+	return db
+}
 
 type InstallationManager struct {
 	queries *database.Queries
@@ -65,9 +95,12 @@ func (im *InstallationManager) CreateInstallation(name string, path string, inst
 // DeleteInstallation removes a local installation from the database and the filesystem, if it exists
 func (im *InstallationManager) DeleteInstallation(name string) error {
 	// Get installation path so that we can later delete it from the filesystem
-	path, _ := im.queries.GetPath(context.Background(), name)
-	//
-	err := im.queries.DeleteInstallation(context.Background(), name)
+	path, err := im.queries.GetPath(context.Background(), name)
+	if err != nil {
+		return fmt.Errorf("no installation found with name %s", name)
+	}
+
+	err = im.queries.DeleteInstallation(context.Background(), name)
 	if err != nil {
 		return err
 	}
@@ -84,4 +117,10 @@ func (im *InstallationManager) GetAllPaths() ([]string, error) {
 func (im *InstallationManager) GetPath(name string) (string, error) {
 	path, err := im.queries.GetPath(context.Background(), name)
 	return path, err
+}
+
+func checkError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
