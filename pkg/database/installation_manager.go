@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/afero"
 	"os"
 )
@@ -16,10 +17,17 @@ const schema = `CREATE TABLE IF NOT EXISTS installations(
     type TEXT NOT NULL,
     FOREIGN KEY (type) REFERENCES installation_type (name)
 );
-
 CREATE TABLE IF NOT EXISTS installation_type (
   name TEXT PRIMARY KEY
-);`
+);
+INSERT INTO installation_type (name) VALUES 
+('distribution'),
+('saas'), 
+('paas'),
+('tests'), 
+('lagoon'),
+('scaffold-tooling');
+`
 
 func NewDatabase(path string) (*sql.DB, error) {
 	if _, err := os.Stat(path); err != nil {
@@ -120,6 +128,11 @@ func (im *InstallationManager) GetAllPaths() ([]string, error) {
 func (im *InstallationManager) GetPath(name string) (string, error) {
 	path, err := im.queries.GetPath(context.Background(), name)
 	return path, err
+}
+
+func (im *InstallationManager) GetType(name string) (string, error) {
+	type_, err := im.queries.GetType(context.Background(), name)
+	return type_, err
 }
 
 func checkError(err error) {

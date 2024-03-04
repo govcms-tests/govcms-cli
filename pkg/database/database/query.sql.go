@@ -75,6 +75,18 @@ func (q *Queries) GetPath(ctx context.Context, name string) (string, error) {
 	return path, err
 }
 
+const getType = `-- name: GetType :one
+SELECT type FROM installations
+where name = ? LIMIT 1
+`
+
+func (q *Queries) GetType(ctx context.Context, name string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getType, name)
+	var type_ string
+	err := row.Scan(&type_)
+	return type_, err
+}
+
 const listInstallations = `-- name: ListInstallations :many
 SELECT name, path, type FROM installations
 ORDER BY name

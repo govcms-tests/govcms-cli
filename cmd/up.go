@@ -23,6 +23,8 @@ func (so *saveOutput) Write(p []byte) (n int, err error) {
 	return os.Stdout.Write(p)
 }
 
+var so saveOutput
+
 var upCmd = &cobra.Command{
 	Use:   "up [resource]",
 	Short: "Launch docker container",
@@ -33,9 +35,81 @@ var upCmd = &cobra.Command{
 }
 
 func Up(cmd *cobra.Command, args []string) {
-	var so saveOutput
-	var installPath string
 	name := args[0]
+	installType, err := installationManager.GetType(name)
+	if err != nil {
+		panic(err)
+	}
+	if installType == "distribution" {
+		launchDistribution(name)
+		return
+	}
+	if installType == "tests" {
+		launchTests(name)
+		return
+	}
+	if installType == "saas" {
+		launchSaas(name)
+		return
+	}
+	if installType == "paas" {
+		launchPaas(name)
+		return
+	}
+	fmt.Printf("%s is not a recognised type\n", installType)
+
+}
+
+func launchTests(name string) {
+	installPath, err := installationManager.GetPath(name)
+	if err != nil {
+		panic(err)
+	}
+
+	// Runs ahoy up
+	command := exec.Command("/bin/sh", "-c", "ahoy up")
+	command.Dir = installPath
+	command.Stdin = os.Stdin
+	command.Stdout = &so
+	command.Stderr = os.Stderr
+	_ = command.Run()
+}
+
+func launchPaas(name string) {
+	// Prepare command execution
+	installPath, err := installationManager.GetPath(name)
+	if err != nil {
+		panic(err)
+	}
+
+	// Runs ahoy init
+	cmdString := "ahoy init " + name + " paas 10; pygmy up; ahoy build; ahoy install; ahoy up"
+	command := exec.Command("/bin/sh", "-c", cmdString)
+	command.Dir = installPath
+	command.Stdin = os.Stdin
+	command.Stdout = &so
+	command.Stderr = os.Stderr
+	_ = command.Run()
+}
+
+func launchSaas(name string) {
+	// Prepare command execution
+	installPath, err := installationManager.GetPath(name)
+	if err != nil {
+		panic(err)
+	}
+
+	// Runs ahoy init
+	cmdString := "ahoy init " + name + " saas 10; pygmy up; ahoy build; ahoy install; ahoy up"
+	command := exec.Command("/bin/sh", "-c", cmdString)
+	command.Dir = installPath
+	command.Stdin = os.Stdin
+	command.Stdout = &so
+	command.Stderr = os.Stderr
+	_ = command.Run()
+}
+
+func launchDistribution(name string) {
 
 	// Prepare command execution
 	installPath, err := installationManager.GetPath(name)
@@ -58,8 +132,8 @@ func Up(cmd *cobra.Command, args []string) {
 }
 
 func setRandomPort(path string) error {
-	//port := getFreePort(49152, 65535)
-	replaceCmd := "sed -i \"\" -E \"s/[0-9]+:80/" + strconv.Itoa(0) + ":80/g\" docker-compose.yml"
+	port := getFreePort(49152, 65535)
+	replaceCmd := "sed -i \"\" -E \"s/[0-9]+:80/" + strconv.Itoa(port) + ":80/g\" docker-compose.yml"
 
 	cmd := exec.Command("bash")
 	cmd.Stdin = strings.NewReader(replaceCmd)

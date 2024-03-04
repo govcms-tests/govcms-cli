@@ -28,3 +28,7 @@ WHERE name = ? LIMIT 1;
 -- name: GetPath :one
 SELECT path FROM  installations
 WHERE name = ? LIMIT 1;
+
+-- name: GetType :one
+SELECT type FROM installations
+where name = ? LIMIT 1;
