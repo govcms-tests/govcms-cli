@@ -22,17 +22,16 @@ THE SOFTWARE.
 package main
 
 import (
+	database "database-sqlc"
 	"github.com/govcms-tests/govcms-cli/cmd"
-	"github.com/govcms-tests/govcms-cli/pkg/data"
+	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/afero"
 	"os"
 )
 
 func main() {
-	db, _ := data.CreateDatabaseIfNotExist()
-
-	//localStorage := data.Initialise(db)
-
+	config, _ := settings.LoadConfig()
+	db := database.NewDatabase(config.Database)
 	rootCmd := cmd.NewRootCmd(afero.NewOsFs(), db)
 	err := rootCmd.Execute()
 	if err != nil {

@@ -18,23 +18,3 @@ var removeCmd = &cobra.Command{
 		return nil
 	},
 }
-
-//func removeInstallationByName(name string) error {
-//	installPath, err := local.GetInstallPath(name)
-//	if err != nil {
-//		fmt.Printf("Unable to find installation '%s'\n", name)
-//		return err
-//	}
-//
-//	err = local.RemoveInstallFromName(name)
-//	if err != nil {
-//		return err
-//	}
-//
-//	err = AppFs.RemoveAll(installPath)
-//	if err != nil {
-//		return err
-//	}
-//	fmt.Printf("Removed '%s' successfully\n", name)
-//	return nil
-//}
