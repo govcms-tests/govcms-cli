@@ -35,7 +35,7 @@ func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 
 	cmd.AddCommand(whereCmd)
 	cmd.AddCommand(removeCmd)
-
+	cmd.AddCommand(inspectCmd)
 	cmd.AddCommand(versionCmd)
 	cmd.AddCommand(NewGetCmd())
 	cmd.AddCommand(upCmd)

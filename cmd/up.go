@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -49,7 +50,7 @@ func Up(cmd *cobra.Command, args []string) {
 		return
 	}
 	if installType == "saas" {
-		launchSaas(name)
+		LaunchSaas(name)
 		return
 	}
 	if installType == "paas" {
@@ -92,7 +93,7 @@ func launchPaas(name string) {
 	_ = command.Run()
 }
 
-func launchSaas(name string) {
+func LaunchSaas(name string) {
 	// Prepare command execution
 	installPath, err := installationManager.GetPath(name)
 	if err != nil {
@@ -127,7 +128,7 @@ func launchDistribution(name string) {
 	_ = command.Run()
 	fmt.Printf("%s", so.savedOutput)
 
-	ip := utils.GetContainerIpByName(name)
+	ip := utils.GetContainerIpByName(strings.ToLower(filepath.Base(installPath)))
 	fmt.Println("\nLocal server has started at", termlink.Link("http://"+ip, "http://"+ip))
 }
 

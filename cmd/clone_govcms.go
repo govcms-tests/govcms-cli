@@ -49,19 +49,13 @@ func CloneGovCMS(name string, govcmsType string, branchName string, prNumber int
 	// TODO inject these dependencies
 	memoryStorage = memory.NewStorage()
 	abstractFilesystemAtRepoPath = utils.NewBillyFromAfero(AppFs, repoPath)
-	err = attemptCloning(repoURL, branchName, prNumber)
+	err = Clone(repoURL, branchName, prNumber)
 	if err != nil {
 		return err
 	}
 
 	// Add to database
-	//res, _ := data.StringToResource(govcmsType)
 	err = installationManager.CreateInstallation(name, repoPath, govcmsType)
-	if err != nil {
-		return err
-	}
-
-	//err = local.InsertInstallation(data.Installation{Name: name, Path: repoPath, Resource: res})
 	if err != nil {
 		return err
 	}
@@ -111,7 +105,7 @@ func getGovcmsURL(govcmsType string) (string, error) {
 	return repoURL, nil
 }
 
-func attemptCloning(repoURL string, branchName string, prNumber int) error {
+func Clone(repoURL string, branchName string, prNumber int) error {
 	_, err := git.Clone(memoryStorage, abstractFilesystemAtRepoPath, &git.CloneOptions{
 		URL:      "https://github.com/" + repoURL + ".git",
 		Progress: os.Stdout,
