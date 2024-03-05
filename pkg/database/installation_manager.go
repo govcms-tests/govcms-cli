@@ -9,6 +9,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/afero"
 	"os"
+	"os/exec"
+	"path/filepath"
 )
 
 const schema = `CREATE TABLE IF NOT EXISTS installations(
@@ -139,4 +141,32 @@ func checkError(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// ======================================================================================================================
+func (im *InstallationManager) AddRaw(url string, location string) error {
+	name := filepath.Base(url)
+	localPath := filepath.Join(location, name)
+
+	cloneString := "git clone " + url + ".git"
+	cmd := exec.Command("/bin/sh", "-c", cloneString)
+	fmt.Println(cloneString)
+	cmd.Dir = location
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error running executing git clone command")
+		return err
+	}
+
+	_, err = im.queries.CreateInstallation(context.Background(), database.CreateInstallationParams{
+		Name: name,
+		Path: localPath,
+		Type: "saas",
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

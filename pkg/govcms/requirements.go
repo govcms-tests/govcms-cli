@@ -31,11 +31,9 @@ func CheckRequirements() error {
 func checkDocker() error {
 	return checkCommand("docker", "--version")
 }
-
 func checkGit() error {
 	return checkCommand("git", "--version")
 }
-
 func checkAhoy() error  { return checkCommand("ahoy", "--version") }
 func checkPygmy() error { return checkCommand("pygmy", "--version") }
 
