@@ -27,7 +27,7 @@ func (so *saveOutput) Write(p []byte) (n int, err error) {
 var so saveOutput
 
 var upCmd = &cobra.Command{
-	Use:   "up [resource]",
+	Use:   "up installation_name",
 	Short: "Build and launch a local GovCMS installation",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

@@ -5,7 +5,7 @@ import (
 )
 
 var removeCmd = &cobra.Command{
-	Use:   "remove",
+	Use:   "remove installation_name",
 	Short: "Remove a local GovCMS installation",
 	Long:  "Remove a local GovCMS installation",
 	RunE: func(cmd *cobra.Command, args []string) error {

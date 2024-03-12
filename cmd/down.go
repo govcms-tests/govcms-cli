@@ -8,7 +8,7 @@ import (
 )
 
 var downCmd = &cobra.Command{
-	Use:   "down",
+	Use:   "down installation_name",
 	Short: "Stop docker container",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

@@ -26,6 +26,8 @@ import (
 	"github.com/govcms-tests/govcms-cli/cmd"
 	"github.com/govcms-tests/govcms-cli/pkg/settings"
 	"github.com/spf13/afero"
+	"github.com/spf13/cobra/doc"
+	"log"
 	"os"
 )
 
@@ -41,4 +43,10 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
+
+	err = doc.GenMarkdownTree(rootCmd, "./docs")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }

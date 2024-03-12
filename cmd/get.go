@@ -12,7 +12,7 @@ func NewGetCmd() *cobra.Command {
 	Reader = os.Stdin
 
 	cmd := &cobra.Command{
-		Use:   "get",
+		Use:   "get [distribution_type] [installation_name]",
 		Short: "Clone a GovCMS distribution, saas, or paas site",
 		Long:  "Clone a GovCMS distribution, saas, or paas site",
 		RunE:  runGetCommand,
