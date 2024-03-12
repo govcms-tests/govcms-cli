@@ -23,8 +23,8 @@ func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 	installationManager = database.NewInstallationManager(db, appFs)
 	cmd := &cobra.Command{
 		Use:     "govcms",
-		Short:   "Lift the GovCMS local development",
-		Long:    "Lift the GovCMS local development",
+		Short:   "A CLI tool to help with the development and maintenance of the GovCMS platform",
+		Long:    "A CLI tool to help with the development and maintenance of the GovCMS platform",
 		Version: "0.1.0",
 	}
 	cobra.OnInitialize(initConfig)
