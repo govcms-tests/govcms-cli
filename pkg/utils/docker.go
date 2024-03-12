@@ -151,7 +151,3 @@ func GetContainerIdByName(name string) (string, error) {
 	return "", fmt.Errorf("container with name %s not found", name)
 
 }
-
-func CreateContainer() {
-
-}

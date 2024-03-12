@@ -1,10 +1,8 @@
 module github.com/govcms-tests/govcms-cli
 
-go 1.21.5
+go 1.21.7
 
-replace (
-	database-sqlc => ./pkg/database
-)
+replace database-sqlc => ./pkg/database
 
 require (
 	github.com/containerd/containerd v1.7.13
@@ -22,6 +20,7 @@ require (
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
+	database-sqlc v0.0.0-00010101000000-000000000000 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/AlecAivazis/survey/v2 v2.3.7 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect

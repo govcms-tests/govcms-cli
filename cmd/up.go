@@ -41,77 +41,14 @@ func Up(cmd *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	if installType == "distribution" {
-		launchDistribution(name)
+	if installType != "distribution" {
+		fmt.Println("The GovCMS CLI currently only supports the launching of the GovCMS distribution.")
 		return
 	}
-	if installType == "tests" {
-		launchTests(name)
-		return
-	}
-	if installType == "saas" {
-		LaunchSaas(name)
-		return
-	}
-	if installType == "paas" {
-		launchPaas(name)
-		return
-	}
-	fmt.Printf("%s is not a recognised type\n", installType)
-
-}
-
-func launchTests(name string) {
-	installPath, err := installationManager.GetPath(name)
-	if err != nil {
-		panic(err)
-	}
-
-	// Runs ahoy up
-	command := exec.Command("/bin/sh", "-c", "ahoy up")
-	command.Dir = installPath
-	command.Stdin = os.Stdin
-	command.Stdout = &so
-	command.Stderr = os.Stderr
-	_ = command.Run()
-}
-
-func launchPaas(name string) {
-	// Prepare command execution
-	installPath, err := installationManager.GetPath(name)
-	if err != nil {
-		panic(err)
-	}
-
-	// Runs ahoy init
-	cmdString := "ahoy init " + name + " paas 10; pygmy up; ahoy build; ahoy install; ahoy up"
-	command := exec.Command("/bin/sh", "-c", cmdString)
-	command.Dir = installPath
-	command.Stdin = os.Stdin
-	command.Stdout = &so
-	command.Stderr = os.Stderr
-	_ = command.Run()
-}
-
-func LaunchSaas(name string) {
-	// Prepare command execution
-	installPath, err := installationManager.GetPath(name)
-	if err != nil {
-		panic(err)
-	}
-
-	// Runs ahoy init
-	cmdString := "ahoy init " + name + " saas 10; pygmy up; ahoy build; ahoy install; ahoy up"
-	command := exec.Command("/bin/sh", "-c", cmdString)
-	command.Dir = installPath
-	command.Stdin = os.Stdin
-	command.Stdout = &so
-	command.Stderr = os.Stderr
-	_ = command.Run()
+	launchDistribution(name)
 }
 
 func launchDistribution(name string) {
-
 	// Prepare command execution
 	installPath, err := installationManager.GetPath(name)
 	if err != nil {
@@ -128,8 +65,8 @@ func launchDistribution(name string) {
 	_ = command.Run()
 	fmt.Printf("%s", so.savedOutput)
 
-	ip := utils.GetContainerIpByName(strings.ToLower(filepath.Base(installPath)))
-	fmt.Println("\nLocal server has started at", termlink.Link("http://"+ip, "http://"+ip))
+	ipString := "http://" + utils.GetContainerIpByName(strings.ToLower(filepath.Base(installPath)))
+	fmt.Println("\nLocal server has started at", termlink.Link(ipString, ipString))
 }
 
 func setRandomPort(path string) error {
