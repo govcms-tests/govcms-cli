@@ -28,14 +28,14 @@ var so saveOutput
 
 var upCmd = &cobra.Command{
 	Use:   "up [resource]",
-	Short: "Launch docker container",
+	Short: "Build and launch a local GovCMS installation",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		Up(cmd, args)
+		Up(args)
 	},
 }
 
-func Up(cmd *cobra.Command, args []string) {
+func Up(args []string) {
 	name := args[0]
 	installType, err := installationManager.GetType(name)
 	if err != nil {
@@ -104,7 +104,10 @@ func isPortFree(port int) (status bool, err error) {
 		return false, err
 	}
 	// close the server
-	server.Close()
+	err = server.Close()
+	if err != nil {
+		return false, err
+	}
 	// we successfully used and closed the port
 	// so it's now available to be used again
 	return true, nil
