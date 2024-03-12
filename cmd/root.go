@@ -25,7 +25,7 @@ func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 		Use:     "govcms",
 		Short:   "A CLI tool to help with the development and maintenance of the GovCMS platform",
 		Long:    "A CLI tool to help with the development and maintenance of the GovCMS platform",
-		Version: "0.1.0",
+		Version: "0.2.1",
 	}
 	cobra.OnInitialize(initConfig)
 
