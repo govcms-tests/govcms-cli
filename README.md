@@ -28,4 +28,4 @@ Build and launch GovCMS installations inside docker containers using:
 govcms up <site_name>
 ```
 
-For a more detailed view of the capabilities of the GovCMS CLI tool, check out the [docs]().
+For a more detailed view of the capabilities of the GovCMS CLI tool, check out the [docs](docs).
