@@ -38,17 +38,10 @@ jobs:
         repo: gotestfmt
           
     - name: Run tests
-      run: sudo go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+      run: go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
       
     - name: Convert go coverage to corbetura format
       run: gocover-cobertura < coverage.txt > coverage.xml
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      with:
-        files: ./coverage.xml
         
     - name: Generate code coverage report
       uses: irongut/CodeCoverageSummary@v1.3.0
