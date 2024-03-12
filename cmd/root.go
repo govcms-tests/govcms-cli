@@ -25,7 +25,7 @@ func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 		Use:     "govcms",
 		Short:   "Lift the GovCMS local development",
 		Long:    "Lift the GovCMS local development",
-		Version: "v0.1.0 -- HEAD",
+		Version: "0.1.0",
 	}
 	cobra.OnInitialize(initConfig)
 
@@ -33,26 +33,12 @@ func NewRootCmd(appFs afero.Fs, db *sql.DB) *cobra.Command {
 	cmd.SetVersionTemplate("GovCMS CLI version " + cmd.Version + "\n")
 	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	cmd.AddCommand(whereCmd)
 	cmd.AddCommand(removeCmd)
-	cmd.AddCommand(inspectCmd)
-	cmd.AddCommand(versionCmd)
 	cmd.AddCommand(NewGetCmd())
 	cmd.AddCommand(upCmd)
 	cmd.AddCommand(downCmd)
-
 	cmd.AddCommand(checkCmd)
-	cmd.AddCommand(cleanupCmd)
-	cmd.AddCommand(distributionCmd)
-	cmd.AddCommand(findCmd)
-
-	cmd.AddCommand(guiCmd)
-	cmd.AddCommand(issueCmd)
 	cmd.AddCommand(listCmd)
-
-	cmd.AddCommand(testCmd)
-
-	cmd.AddCommand(updateCmd)
 
 	// Register the persistent pre-run function
 	cmd.PersistentPreRunE = preRun
