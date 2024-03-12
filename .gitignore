@@ -23,3 +23,4 @@ go.work
 .idea
 
 tests/test.db
+dist/
