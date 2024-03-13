@@ -10,8 +10,8 @@ require (
 	github.com/docker/docker v25.0.3+incompatible
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
-	github.com/manifoldco/promptui v0.9.0
 	github.com/mattn/go-sqlite3 v1.14.22
+	github.com/moorara/promptui v0.10.0
 	github.com/opencontainers/image-spec v1.1.0-rc6
 	github.com/savioxavier/termlink v1.3.0
 	github.com/spf13/afero v1.11.0
