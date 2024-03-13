@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
+	"github.com/moorara/promptui"
 	"github.com/spf13/cobra"
 	"os"
 	"strings"
