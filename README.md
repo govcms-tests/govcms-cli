@@ -1,4 +1,4 @@
-# Govcms-Cli
+# GovCMS CLI
 GovCMS's command line tool for local development.
 
 # Requirements
